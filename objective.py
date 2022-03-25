@@ -5,13 +5,12 @@ from benchopt import BaseObjective
 class Objective(BaseObjective):
     name = "Ordinary Least Squares"
 
-    parameters = {'fit_intercept': [False]}
 
-    def __init__(self, fit_intercept=False):
-        self.fit_intercept = fit_intercept
+    def __init__(self, reg = 100):
+        self.reg = reg
 
-    def set_data(self, reg, y):
-        self.reg, self.y = reg, y
+    def set_data(self, y):
+        self.y = y
 
     def compute(self, x):
         A = np.eye(len(self.y), dtype=int)

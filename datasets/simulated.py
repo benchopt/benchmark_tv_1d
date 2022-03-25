@@ -22,11 +22,10 @@ class Dataset(BaseDataset):
     def get_data(self):
         t = np.arange(1000)
         T = 1000
-        reg = 100
     
         rng = np.random.RandomState(47)
         y = np.cos(np.pi*t/T) + rng.normal(self.mu, self.sigma, len(t))
         
-        data = dict(reg=reg, y=y)
+        data = dict(y=y)
         
         return y.shape[0], data
