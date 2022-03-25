@@ -1,5 +1,4 @@
 import numpy as np
-
 from benchopt import BaseDataset
 
 
@@ -9,24 +8,24 @@ class Dataset(BaseDataset):
 
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
+    # cos + bruit ~ N(mu, sigma)
     parameters = {
-        'n_samples, n_features': [
-            (1000, 500),
-            (5000, 200)]
-    }
+        'sigma' : [0.1, 0.5],
+	    'mu' : [0]}
 
-    def __init__(self, n_samples=10, n_features=50, random_state=27):
+    def __init__(self, mu=0, sigma=0.3, random_state=27):
         # Store the parameters of the dataset
-        self.n_samples = n_samples
-        self.n_features = n_features
+        self.mu = mu
+        self.sigma = sigma
         self.random_state = random_state
 
     def get_data(self):
-
-        rng = np.random.RandomState(self.random_state)
-        X = rng.randn(self.n_samples, self.n_features)
-        y = rng.randn(self.n_samples)
-
-        data = dict(X=X, y=y)
-
-        return self.n_features, data
+        t = np.arange(1000)
+        T = 1000
+    
+        rng = np.random.RandomState(47)
+        y = np.cos(np.pi*t/T) + rng.normal(self.mu, self.sigma, len(t))
+        
+        data = dict(y=y)
+        
+        return y.shape[0], data
