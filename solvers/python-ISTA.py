@@ -13,13 +13,15 @@ class Solver(BaseSolver):
         self.y = y
 
     def run(self, n_iter):
-        L = np.tri(len(self.y))
-        A = np.eye(len(self.y), dtype=int)
+        len_y = len(self.y)
+        L = np.tri(len_y)
+        A = np.eye(len_y, dtype=int)
         AL = A @ L
-        rho = np.linalg.norm(AL, ord=2)**2
-        z = np.concatenate(([self.y[0]], np.diff(self.y)))
+        stepsize = 1 / (np.linalg.norm(AL, ord=2)**2)  # 1/ rho
+        z = np.zeros(len_y)  # initialisation
         for _ in range(n_iter):
-            z = self.st(z + 1/rho * AL.T @ (self.y - AL @ z), self.reg / rho)
+            z = self.st(z + stepsize * AL.T @ (self.y - AL @ z),
+                        self.reg * stepsize)
         self.x = L.dot(z)
 
     def get_result(self):
