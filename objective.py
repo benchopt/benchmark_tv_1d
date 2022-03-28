@@ -5,8 +5,7 @@ from benchopt import BaseObjective
 class Objective(BaseObjective):
     name = "Ordinary Least Squares"
 
-
-    def __init__(self, reg = 100):
+    def __init__(self, reg=100):
         self.reg = reg
 
     def set_data(self, y):

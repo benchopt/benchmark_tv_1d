@@ -11,13 +11,12 @@ class Solver(BaseSolver):
     def set_objective(self, reg, y):
         self.reg = reg
         self.y = y
-    
+
     def run(self, n_iter):
         L = np.tri(len(self.y))
         A = np.eye(len(self.y), dtype=int)
         AL = A @ L
         rho = np.linalg.norm(AL, ord=2)**2
-    	
         z = np.concatenate(([self.y[0]], np.diff(self.y)))
         for _ in range(n_iter):
             z = self.st(z + 1/rho * AL.T @ (self.y - AL @ z), self.reg / rho)
@@ -31,4 +30,3 @@ class Solver(BaseSolver):
         w -= np.sign(w) * abs(np.clip(w, -mu, mu))
         w[0] = w0
         return w
- 
