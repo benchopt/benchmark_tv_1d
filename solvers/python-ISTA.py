@@ -8,9 +8,9 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
 
-    def set_objective(self, reg, y):
+    def set_objective(self, reg_max, y, reg=0.5):
         self.reg = reg
-        self.y = y
+        self.reg_max, self.y = reg_max, y
 
     def run(self, n_iter):
         len_y = len(self.y)
@@ -18,10 +18,11 @@ class Solver(BaseSolver):
         A = np.eye(len_y, dtype=int)
         AL = A @ L
         stepsize = 1 / (np.linalg.norm(AL, ord=2)**2)  # 1/ rho
+        reg_tot = self.reg*self.reg_max
         z = np.zeros(len_y)  # initialisation
         for _ in range(n_iter):
             z = self.st(z + stepsize * AL.T @ (self.y - AL @ z),
-                        self.reg * stepsize)
+                        reg_tot * stepsize)
         self.x = L.dot(z)
 
     def get_result(self):
