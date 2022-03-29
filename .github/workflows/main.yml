@@ -58,6 +58,7 @@ jobs:
 
     - name: Test
       run: |
+        pip install -U git+https://github.com/albarji/proxTV
         benchopt test . --env-name bench_test_env -vl
         benchopt test . --env-name bench_test_env -vl --skip-install
 
