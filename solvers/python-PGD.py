@@ -1,4 +1,3 @@
-import numpy as np
 import prox_tv as ptv
 from benchopt import BaseSolver
 
@@ -14,7 +13,6 @@ class Solver(BaseSolver):
         self.reg_max, self.y = reg_max, y
 
     def run(self, n_iter):
-        len_y = len(self.y)
         reg_tot = self.reg*self.reg_max
         x = ptv.tv1_1d(self.y, reg_tot)
         self.x = x
