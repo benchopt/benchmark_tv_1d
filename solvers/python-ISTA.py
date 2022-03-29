@@ -8,7 +8,7 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
 
-    def set_objective(self, reg_max, y, reg=0.5):
+    def set_objective(self, reg_max, y, reg):
         self.reg = reg
         self.reg_max, self.y = reg_max, y
 
