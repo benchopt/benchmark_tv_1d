@@ -28,10 +28,6 @@ jobs:
       BENCHOPT_BRANCH: benchopt:main
       BENCHOPT_DEBUG: 1
 
-    - name: Install blas/lapack on Linux
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install -y libblas-dev liblapack-dev
-
     defaults:
       run:
         # Need to use this shell to get conda working properly.
@@ -40,6 +36,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install blas/lapack on Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get install -y libblas-dev liblapack-dev
+
     - name: Setup Conda
       uses: conda-incubator/setup-miniconda@v2
       with:
