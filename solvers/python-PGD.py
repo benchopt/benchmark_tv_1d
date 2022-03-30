@@ -24,7 +24,9 @@ class Solver(BaseSolver):
         stepsize = 1 / (np.linalg.norm(self.A, ord=2)**2)  # 1/ rho
         x = np.zeros(len(self.y))  # initialisation
         for _ in range(n_iter):
-            x = ptv.tv1_1d(x + stepsize * self.A.T @ (self.y - self.A @ x), reg_tot * stepsize, method='condat')
+            x = ptv.tv1_1d(
+                x + stepsize * self.A.T @ (self.y - self.A @ x), 
+                reg_tot * stepsize, method='condat')
         self.x = x
 
     def get_result(self):
