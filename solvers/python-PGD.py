@@ -1,3 +1,4 @@
+import numpy as np
 from benchopt import BaseSolver
 from benchopt import safe_import_context
 
@@ -6,7 +7,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Gradient descent solver, optionally accelerated."""
+    """analytique"""
     name = 'PGD'
 
     install_cmd = 'conda'
@@ -14,13 +15,17 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
 
-    def set_objective(self, reg_max, y, reg):
-        self.reg = reg
-        self.reg_max, self.y = reg_max, y
+    def set_objective(self, A, reg, reg_max, y):
+        self.reg, self.reg_max = reg, reg_max
+        self.A, self.y = A, y
 
     def run(self, n_iter):
         reg_tot = self.reg*self.reg_max
-        x = ptv.tv1_1d(self.y, reg_tot)
+        stepsize = 1 / (np.linalg.norm(self.A, ord=2)**2)  # 1/ rho
+        x = np.zeros(len(self.y))  # initialisation
+        for _ in range(n_iter):
+            x = ptv.tv1_1d(x + stepsize * self.A.T @ (self.y - self.A @ x),
+                        reg_tot * stepsize, method='condat')
         self.x = x
 
     def get_result(self):
