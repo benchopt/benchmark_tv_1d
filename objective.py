@@ -15,6 +15,7 @@ class Objective(BaseObjective):
     def compute(self, x):
         A = np.eye(len(self.y), dtype=int)
         R = self.y - A @ x
+        ## hello
         # S = np.sum(A, axis=1)
         # c = S.dot(self.y)/(S.dot(S))*np.eye(len(self.y), dtype=int)
         # reg_max = np.max(abs(np.transpose(A).dot(A.dot(c) - self.y)))
