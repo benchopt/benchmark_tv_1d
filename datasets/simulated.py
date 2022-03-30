@@ -25,9 +25,14 @@ class Dataset(BaseDataset):
         t = np.arange(self.T)
         rng = np.random.RandomState(47)
         y = np.cos(np.pi*t/self.T*10) + rng.normal(self.mu, self.sigma, self.T)
-        A = np.eye(self.T, dtype=int)
-        A = rng.rand(self.T, self.T)
-        #A = A / A.sum(axis=1)
+        
+        # different matrix A that we can choose
+        # A = np.eye(self.T, dtype=int)  # identity
+        A = np.diag(rng.random(self.T))  # diagonal
+        # A = np.triu(rng.rand(self.T, self.T))  #  triangulaire
+        # A = rng.rand(self.T, self.T)  # totally random
+        # A = A / A.sum(axis=1)  # nomalized by row
+        
         data = dict(A=A, y=y)
 
         return y.shape[0], data
