@@ -24,12 +24,12 @@ class Solver(BaseSolver):
     def run(self, callback):
         reg_tot = self.reg*self.reg_max
         stepsize = 1 / (np.linalg.norm(self.A, ord=2)**2)  # 1/ rho
-        x = np.zeros(len(self.y))  # initialisation
-        while callback(x):
-            x = ptv.tv1_1d(
-                x + stepsize * self.A.T @ (self.y - self.A @ x),
+        u = np.zeros(len(self.y))  # initialisation
+        while callback(u):
+            u = ptv.tv1_1d(
+                u - stepsize * self.A.T @ (self.A @ u - self.y),
                 reg_tot * stepsize, method='condat')
-        self.x = x
+        self.u = u
 
     def get_result(self):
-        return self.x
+        return self.u

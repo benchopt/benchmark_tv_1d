@@ -12,9 +12,9 @@ class Objective(BaseObjective):
         self.A = A
         self.y = y
 
-    def compute(self, x):
-        R = self.y - self.A @ x
-        return .5 * R @ R + self.reg*self.reg_max*(abs(np.diff(x)).sum())
+    def compute(self, u):
+        R = self.y - self.A @ u
+        return .5 * R @ R + self.reg*self.reg_max*(abs(np.diff(u)).sum())
 
     def to_dict(self):
         S = np.sum(self.A, axis=1)
