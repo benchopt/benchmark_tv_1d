@@ -13,19 +13,21 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
     requirements = ['pip:prox-tv']
 
+    stopping_strategy = "callback"
+
     # any parameter defined here is accessible as a class attribute
 
     def set_objective(self, A, reg, reg_max, y):
         self.reg, self.reg_max = reg, reg_max
         self.A, self.y = A, y
 
-    def run(self, n_iter):
+    def run(self, callback):
         reg_tot = self.reg*self.reg_max
         stepsize = 1 / (np.linalg.norm(self.A, ord=2)**2)  # 1/ rho
         x = np.zeros(len(self.y))  # initialisation
-        for _ in range(n_iter):
+        while callback(x):
             x = ptv.tv1_1d(
-                x + stepsize * self.A.T @ (self.y - self.A @ x), 
+                x + stepsize * self.A.T @ (self.y - self.A @ x),
                 reg_tot * stepsize, method='condat')
         self.x = x
 
