@@ -8,14 +8,17 @@ class Objective(BaseObjective):
     def __init__(self, reg=0.5):
         self.reg = reg  # 0<reg<1
 
-    def set_data(self, reg_max, y):
-        self.reg_max = reg_max
+    def set_data(self, A, y):
+        self.A = A
         self.y = y
+        S = np.sum(self.A, axis=1)
+        c = S.dot(self.y)/(S.dot(S))*np.eye(len(self.y), dtype=int)
+        reg_max = np.max(abs((self.A).T.dot(self.A.dot(c) - self.y)))
+        self.reg = self.reg*reg_max
 
-    def compute(self, x):
-        A = np.eye(len(self.y), dtype=int)
-        R = self.y - A @ x
-        return .5 * R @ R + self.reg*self.reg_max*(abs(np.diff(x)).sum())
+    def compute(self, u):
+        R = self.y - self.A @ u
+        return .5 * R @ R + self.reg*(abs(np.diff(u)).sum())
 
     def to_dict(self):
-        return dict(reg=self.reg, reg_max=self.reg_max, y=self.y)
+        return dict(A=self.A, reg=self.reg, y=self.y)
