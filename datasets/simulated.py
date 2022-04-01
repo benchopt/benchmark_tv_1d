@@ -10,27 +10,35 @@ class Dataset(BaseDataset):
     # the cross product for each key in the dictionary.
     # cos + bruit ~ N(mu, sigma)
     parameters = {
-        'sigma': np.linspace(0.1, 0.5, 3).round(1),
+        'sigma': [0.1],
         'mu': [0],
-        'K': [20]}
+        'K': [20],
+        'type_A': ['identity', 'diagonal', 'triangulaire', 'random']}
 
-    def __init__(self, mu=0, sigma=0.3, K=10, random_state=27):
+    def __init__(self, mu=0, sigma=0.3, K=10,
+                 type_A='identity', random_state=27):
         # Store the parameters of the dataset
         self.mu = mu
         self.sigma = sigma
         self.K = K
+        self.type_A = type_A
         self.random_state = random_state
+
+    def set_A(self, rng):
+        if(self.type_A == 'diagonal'):
+            A = np.diag(rng.random(self.K))
+        elif(self.type_A == 'triangulaire'):
+            A = np.triu(rng.rand(self.K, self.K))
+        elif(self.type_A == 'random'):
+            A = rng.rand(self.K, self.K)
+        else:
+            A = np.eye(self.K, dtype=int)
+        return A
 
     def get_data(self):
         t = np.arange(self.K)
         rng = np.random.RandomState(47)
         y = np.cos(np.pi*t/self.K*10) + rng.normal(self.mu, self.sigma, self.K)
-        # different matrix A that we can choose
-        # A = np.eye(self.K, dtype=int)  # identity
-        A = np.diag(rng.random(self.K))  # diagonal
-        # A = np.triu(rng.rand(self.K, self.K))  #  triangulaire
-        # A = rng.rand(self.K, self.K)  # totally random
-        # A = A / A.sum(axis=1)  # nomalized by row
-        data = dict(A=A, y=y)
+        data = dict(A=self.set_A(rng), y=y)
 
         return y.shape[0], data
