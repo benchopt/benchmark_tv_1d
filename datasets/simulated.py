@@ -13,7 +13,7 @@ class Dataset(BaseDataset):
         'sigma': [0.1],
         'mu': [0],
         'K': [20],
-        'type_A': ['identity', 'diagonal', 'triangulaire', 'random']}
+        'type_A': ['identity', 'diagonal', 'triangular', 'random']}
 
     def __init__(self, mu=0, sigma=0.3, K=10,
                  type_A='identity', random_state=27):
@@ -25,14 +25,14 @@ class Dataset(BaseDataset):
         self.random_state = random_state
 
     def set_A(self, rng):
-        if(self.type_A == 'diagonal'):
+        if self.type_A == 'diagonal':
             A = np.diag(rng.random(self.K))
-        elif(self.type_A == 'triangulaire'):
-            A = np.triu(rng.rand(self.K, self.K))
-        elif(self.type_A == 'random'):
-            A = rng.rand(self.K, self.K)
+        elif self.type_A == 'triangular':
+            A = np.triu(rng.randn(self.K, self.K))
+        elif self.type_A == 'random':
+            A = rng.randn(self.K, self.K)
         else:
-            A = np.eye(self.K, dtype=int)
+            A = np.eye(self.K, dtype=float)
         return A
 
     def get_data(self):
