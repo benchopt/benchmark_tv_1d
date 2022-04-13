@@ -1,0 +1,54 @@
+import numpy as np
+from benchopt import BaseSolver
+from benchopt.stopping_criterion import SufficientProgressCriterion
+
+
+class Solver(BaseSolver):
+    """analysis and synthesis : primal and dual"""
+    name = 'CondatVu'
+
+    stopping_criterion = SufficientProgressCriterion(
+        patience=10, strategy='callback'
+    )
+
+    # any parameter defined here is accessible as a class attribute
+    parameters = {'eta': [1.],
+                  'echange_primal_dual': [False, True]}
+
+    def set_objective(self, A, reg, y):
+        self.reg = reg
+        self.A, self.y = A, y
+
+    def run(self, callback):
+        len_y = len(self.y)
+        D = (np.eye(len_y, k=1) - np.identity(len_y))[:-1]
+        u = np.linalg.pinv(self.A) @ self.y  # initialisation
+        z = D @ u
+
+        sigma = 0.5
+        eta = self.eta
+        tau = 1 / (np.linalg.norm(self.A.T @ self.A, ord=2) /
+                   2 + sigma * np.linalg.norm(D, ord=2)**2)
+
+        while callback(u):
+            if self.echange_primal_dual:
+                z_tmp = z + sigma * D @ u - sigma * \
+                    self.st(z / sigma + D @ u, self.reg / sigma)
+                u_tmp = u - tau * \
+                    self.A.T @ (self.A @ u - self.y) - \
+                    tau * D.T @ (2 * z_tmp - z)
+            else:
+                u_tmp = u - tau * \
+                    self.A.T @ (self.A @ u - self.y) - tau * D.T @ z
+                z_tmp = z + sigma * D @ (2 * u_tmp - u) - sigma * self.st(
+                    z / sigma + D @ (2 * u_tmp - u), self.reg / sigma)
+            u = eta * u_tmp + (1 - eta)*u
+            z = eta * z_tmp + (1 - eta)*z
+        self.u = u
+
+    def get_result(self):
+        return self.u
+
+    def st(self, w, mu):
+        w -= np.sign(w) * abs(np.clip(w, -mu, mu))
+        return w
