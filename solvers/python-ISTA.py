@@ -19,10 +19,10 @@ class Solver(BaseSolver):
         AL = self.A @ L
         stepsize = 1 / (np.linalg.norm(AL, ord=2)**2)  # 1/ rho
         z = np.zeros(len_y)  # initialisation
-        while callback(L.dot(z)):
+        while callback(L @ z):
             z = self.st(z - stepsize * AL.T @ (AL @ z - self.y),
                         self.reg * stepsize)
-        self.u = L.dot(z)
+        self.u = L @ z
 
     def get_result(self):
         return self.u
