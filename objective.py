@@ -5,6 +5,8 @@ from benchopt import BaseObjective
 class Objective(BaseObjective):
     name = "Ordinary Least Squares"
 
+    parameters = {'reg': np.linspace(0.1, 1, 5).round(1)}
+
     def __init__(self, reg=0.5):
         self.reg = reg  # 0<reg<1
 
