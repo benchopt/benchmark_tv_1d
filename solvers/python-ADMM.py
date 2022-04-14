@@ -1,6 +1,10 @@
-import numpy as np
 from benchopt import BaseSolver
 from benchopt.stopping_criterion import SufficientProgressCriterion
+from benchopt import safe_import_context
+from scipy.sparse import spdiags
+
+with safe_import_context() as import_ctx:
+    import numpy as np
 
 
 class Solver(BaseSolver):
@@ -12,7 +16,7 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'gamma': [1.5],
+    parameters = {'gamma': np.linspace(1.1, 2, 5).round(1),
                   'update_penalization': [False, True]}
 
     def set_objective(self, A, reg, y):
@@ -21,18 +25,23 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
-        D = (np.eye(len_y, k=1) - np.identity(len_y))[:-1]
+        data = np.array([np.ones(len_y), -np.ones(len_y)])
+        diags = np.array([0, 1])
+        D = spdiags(data, diags, len_y-1, len_y).toarray()
         u = np.zeros(len_y)
         z = np.zeros(len_y - 1)
         mu = np.zeros(len_y - 1)
         gamma = self.gamma
+        AtA = self.A.T @ self.A
+        DtD = D.T @ D
+        Aty = self.A.T @ self.y
+        A_tmp = np.linalg.pinv(AtA + gamma * DtD)
 
         while callback(u):
             z_old = z
-            A_tmp = np.linalg.pinv(self.A.T @ self.A + gamma * D.T @ D)
-            u = A_tmp @ (self.A.T @ self.y - D.T @ mu + gamma * D.T @ z)
+            u = A_tmp @ (Aty - D.T @ mu + gamma * D.T @ z)
             z = self.st(D @ u + mu / gamma, self.reg / gamma)
-            mu += gamma*(D @ u - z)
+            mu += gamma * (D @ u - z)
 
             if self.update_penalization:
                 r = np.linalg.norm(D @ u - z, ord=2)
