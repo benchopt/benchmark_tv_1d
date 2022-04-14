@@ -15,7 +15,7 @@ class Solver(BaseSolver):
     name = 'Celer'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=50, strategy='iteration'
+        patience=10, strategy='iteration'
     )
     install_cmd = 'conda'
     requirements = ['pip:celer']
@@ -46,7 +46,7 @@ class Solver(BaseSolver):
         self.lasso.fit(AL_new, y_new)
         z = self.lasso.coef_.flatten()
         c = np.mean(self.y - AL @ z)
-        self.u = L @ z + np.linalg.pinv(self.A) @ np.ones(len_y) * c
+        self.u = L @ z + np.linalg.pinv(self.A) @ (np.ones(len_y) * c)
 
     @staticmethod
     def get_next(previous):

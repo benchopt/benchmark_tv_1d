@@ -1,6 +1,10 @@
-import numpy as np
 from benchopt import BaseSolver
 from benchopt.stopping_criterion import SufficientProgressCriterion
+from benchopt import safe_import_context
+from scipy.sparse import spdiags
+
+with safe_import_context() as import_ctx:
+    import numpy as np
 
 
 class Solver(BaseSolver):
@@ -21,7 +25,9 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
-        D = (np.eye(len_y, k=1) - np.identity(len_y))[:-1]
+        data = np.array([np.ones(len_y), -np.ones(len_y)])
+        diags = np.array([0, 1])
+        D = spdiags(data, diags, len_y-1, len_y).toarray()
         u = np.linalg.pinv(self.A) @ self.y  # initialisation
         z = D @ u
 
