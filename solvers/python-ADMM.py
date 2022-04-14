@@ -1,10 +1,10 @@
 from benchopt import BaseSolver
 from benchopt.stopping_criterion import SufficientProgressCriterion
 from benchopt import safe_import_context
-from scipy.sparse import spdiags
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    from scipy.sparse import spdiags
 
 
 class Solver(BaseSolver):
@@ -16,7 +16,8 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'gamma': np.linspace(1.1, 2, 5).round(1),
+    parameters = {'gamma': np.linspace(1.2, 2, 5).round(1),
+                  #  'gamma': [1.5],
                   'update_penalization': [False, True]}
 
     def set_objective(self, A, reg, y):
@@ -27,7 +28,7 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y).toarray()
+        D = spdiags(data, diags, len_y-1, len_y)
         u = np.zeros(len_y)
         z = np.zeros(len_y - 1)
         mu = np.zeros(len_y - 1)
