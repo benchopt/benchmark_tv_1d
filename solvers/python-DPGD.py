@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """analysis and synthesis : primal and dual"""
+    """Dual Projected gradient descent for synthesis formulation."""
     name = 'DPGD'
 
     stopping_criterion = SufficientProgressCriterion(

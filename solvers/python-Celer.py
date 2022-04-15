@@ -12,6 +12,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
+    """Coordinate descent for synthesis formulation as lasso problem."""
     name = 'Celer'
 
     stopping_criterion = SufficientProgressCriterion(
@@ -50,7 +51,7 @@ class Solver(BaseSolver):
 
     @staticmethod
     def get_next(previous):
-        "Linear growth for n_iter."
+        """Linear growth for n_iter."""
         return previous + 1
 
     def get_result(self):

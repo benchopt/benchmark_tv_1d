@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """analysis and synthesis : primal and dual"""
+    """Primal-Dual Splitting Method for synthesis and analysis formulation."""
     name = 'CondatVu'
 
     stopping_criterion = SufficientProgressCriterion(
@@ -17,7 +17,7 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'eta': [1.],
-                  'echange_primal_dual': [False, True]}
+                  'swap': [False, True]}
 
     def set_objective(self, A, reg, y):
         self.reg = reg
@@ -37,7 +37,7 @@ class Solver(BaseSolver):
                    2 + sigma * np.linalg.norm(D, ord=2)**2)
 
         while callback(u):
-            if self.echange_primal_dual:
+            if self.swap:
                 z_tmp = z + sigma * D @ u - sigma * \
                     self.st(z / sigma + D @ u, self.reg / sigma)
                 u_tmp = u - tau * \
