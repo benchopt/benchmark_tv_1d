@@ -27,7 +27,7 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y).toarray()
+        D = spdiags(data, diags, len_y-1, len_y)
         u = np.zeros(len_y)
         z = np.zeros(len_y - 1)
         mu = np.zeros(len_y - 1)
@@ -39,7 +39,7 @@ class Solver(BaseSolver):
 
         while callback(u):
             z_old = z
-            u = A_tmp @ (Aty - D.T @ mu + gamma * D.T @ z)
+            u = np.ravel(A_tmp @ (Aty - D.T @ mu + gamma * D.T @ z))
             z = self.st(D @ u + mu / gamma, self.reg / gamma)
             mu += gamma * (D @ u - z)
 
