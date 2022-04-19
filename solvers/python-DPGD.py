@@ -12,7 +12,7 @@ class Solver(BaseSolver):
     name = 'DPGD'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=10, strategy='callback'
+        patience=20, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute
