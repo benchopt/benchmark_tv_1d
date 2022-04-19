@@ -5,6 +5,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
+    from scipy.sparse.linalg import norm as spnorm
 
 
 class Solver(BaseSolver):
@@ -27,14 +28,14 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y).toarray()
+        D = spdiags(data, diags, len_y-1, len_y)
         u = np.zeros(len_y)  # initialisation
         z = np.zeros(len_y - 1)
 
         sigma = 0.5
         eta = self.eta
         tau = 1 / (np.linalg.norm(self.A.T @ self.A, ord=2) /
-                   2 + sigma * np.linalg.norm(D, ord=2)**2)
+                   2 + sigma * spnorm(D)**2)
 
         while callback(u):
             if self.swap:
