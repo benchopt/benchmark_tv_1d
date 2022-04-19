@@ -12,12 +12,12 @@ class Solver(BaseSolver):
     name = 'CondatVu'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=10, strategy='callback'
+        patience=20, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'eta': [1.],
-                  'swap': [False, True]}
+    parameters = {'eta': [0.5, 1],
+                  'swap': [False]}
 
     def set_objective(self, A, reg, y):
         self.reg = reg
@@ -27,9 +27,9 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
-        u = np.linalg.pinv(self.A) @ self.y  # initialisation
-        z = D @ u
+        D = spdiags(data, diags, len_y-1, len_y).toarray()
+        u = np.zeros(len_y)  # initialisation
+        z = np.zeros(len_y - 1)
 
         sigma = 0.5
         eta = self.eta

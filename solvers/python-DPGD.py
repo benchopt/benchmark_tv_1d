@@ -25,7 +25,7 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
+        D = spdiags(data, diags, len_y-1, len_y).toarray()
         DA_inv = D @ np.linalg.pinv(self.A)
         v = np.zeros(len_y - 1)
         u = np.zeros(len_y)

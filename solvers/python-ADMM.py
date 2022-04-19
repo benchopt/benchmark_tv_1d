@@ -12,13 +12,12 @@ class Solver(BaseSolver):
     name = 'ADMM'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=10, strategy='callback'
+        patience=20, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'gamma': np.linspace(1.2, 2, 5).round(1),
-                  #  'gamma': [1.5],
-                  'update_penalization': [False, True]}
+    parameters = {'gamma': [1.5, 1.9],
+                  'update_pen': [False]}
 
     def set_objective(self, A, reg, y):
         self.reg = reg
@@ -28,7 +27,7 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
+        D = spdiags(data, diags, len_y-1, len_y).toarray()
         u = np.zeros(len_y)
         z = np.zeros(len_y - 1)
         mu = np.zeros(len_y - 1)
@@ -44,7 +43,7 @@ class Solver(BaseSolver):
             z = self.st(D @ u + mu / gamma, self.reg / gamma)
             mu += gamma * (D @ u - z)
 
-            if self.update_penalization:
+            if self.update_pen:
                 r = np.linalg.norm(D @ u - z, ord=2)
                 s = np.linalg.norm(gamma * D.T @ (z - z_old), ord=2)
                 if r > 10 * s:
