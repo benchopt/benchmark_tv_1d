@@ -12,7 +12,7 @@ class Dataset(BaseDataset):
     parameters = {
         'sigma': [0.1],
         'mu': [0],
-        'K': [20],
+        'K': [50],
         'type_A': ['identity', 'diagonal', 'triangular', 'random']}
 
     def __init__(self, mu=0, sigma=0.3, K=10,
