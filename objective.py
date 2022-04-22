@@ -14,8 +14,9 @@ class Objective(BaseObjective):
         self.A = A
         self.y = y
         S = np.sum(self.A, axis=1)
-        c = S.dot(self.y)/(S.dot(S))*np.eye(len(self.y), dtype=int)
-        reg_max = np.max(abs((self.A).T.dot(self.A.dot(c) - self.y)))
+        c = (S @ self.y)/(S @ S)
+        L = np.tri(y.shape[0])
+        reg_max = np.max(abs(L.T @ (self.A.T @ (S * c - self.y))))
         self.reg = self.reg*reg_max
 
     def compute(self, u):

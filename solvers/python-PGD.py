@@ -25,9 +25,14 @@ class Solver(BaseSolver):
     def run(self, callback):
         len_y = len(self.y)
         stepsize = 1 / (np.linalg.norm(self.A, ord=2)**2)  # 1/ rho
-        u = np.zeros(len_y)  # initialisation
-        u_old = np.zeros(len_y)
-        u_acc = np.zeros(len_y)
+
+        # initialisation
+        S = np.sum(self.A, axis=1)
+        c = (S @ self.y)/(S @ S)
+        u = c * np.ones(len_y)
+        u_acc = u.copy()
+        u_old = u.copy()
+
         t_new = 1
         while callback(u):
             if self.use_acceleration:

@@ -33,21 +33,22 @@ class Solver(BaseSolver):
         warnings.filterwarnings('ignore', category=ConvergenceWarning)
         self.lasso = Lasso(
             alpha=self.reg / self.y.shape[0], max_iter=1, max_epochs=100000,
-            tol=1e-12, prune=True,
+            tol=1e-12, prune=True, fit_intercept=False,
             warm_start=False, positive=False, verbose=False,
         )
 
     def run(self, n_iter):
         len_y = self.y.shape[0]
-        L = np.tri(len_y)
-        AL = self.A @ L
-        y_new = self.y - np.mean(self.y)
-        AL_new = AL - np.mean(AL, axis=0, keepdims=True)
+        L = np.tri(len_y)[:, 1:]
+        S = np.sum(self.A, axis=1)
+        A_op = self.A @ np.ones((len_y, len_y)) @ (self.A.T) / (S @ S)
+        y_new = self.y - A_op @ self.y
+        AL_new = self.A @ L - A_op @ self.A @ L
         self.lasso.max_iter = n_iter
         self.lasso.fit(AL_new, y_new)
         z = self.lasso.coef_.flatten()
-        c = np.mean(self.y - AL @ z)
-        self.u = L @ z + np.linalg.pinv(self.A) @ (np.ones(len_y) * c)
+        c = S @ (self.y - self.A @ L @ z) / (S @ S)
+        self.u = L @ z + c
 
     @staticmethod
     def get_next(previous):

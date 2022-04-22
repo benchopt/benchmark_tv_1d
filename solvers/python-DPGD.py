@@ -29,7 +29,7 @@ class Solver(BaseSolver):
         DA_inv = D @ np.linalg.pinv(self.A)
         v = np.zeros(len_y - 1)
         u = np.zeros(len_y)
-        stepsize = 1 / (np.linalg.norm(DA_inv, ord=2)**2)  # 1/ rho
+        stepsize = 1.99 / (np.linalg.norm(DA_inv, ord=2)**2)  # 1.99 / rho
         DA_invDA_invt = DA_inv @ DA_inv.T
         DA_invy = DA_inv @ self.y
         AtA_inv = np.linalg.pinv(self.A.T @ self.A)

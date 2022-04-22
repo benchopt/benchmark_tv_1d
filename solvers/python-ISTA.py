@@ -20,7 +20,7 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         L = np.tri(len_y)
         AL = self.A @ L
-        stepsize = 1 / (np.linalg.norm(AL, ord=2)**2)  # 1/ rho
+        stepsize = 1.99 / (np.linalg.norm(AL, ord=2)**2)  # 1.99 / rho
         z = np.zeros(len_y)  # initialisation
         while callback(L @ z):
             z = self.st(z - stepsize * AL.T @ (AL @ z - self.y),
