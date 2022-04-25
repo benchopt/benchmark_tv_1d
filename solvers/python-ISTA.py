@@ -1,4 +1,5 @@
 from benchopt import BaseSolver
+from benchopt.stopping_criterion import SufficientProgressCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -9,8 +10,9 @@ class Solver(BaseSolver):
     """Proximal gradient descent for synthesis formulation."""
     name = 'ISTA'
 
-    stopping_strategy = "callback"
-    # any parameter defined here is accessible as a class attribute
+    stopping_criterion = SufficientProgressCriterion(
+        patience=20, strategy='callback'
+    )
 
     def set_objective(self, A, reg, y):
         self.reg = reg

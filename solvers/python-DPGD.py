@@ -12,10 +12,8 @@ class Solver(BaseSolver):
     name = 'DPGD'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=20, strategy='callback'
+        patience=100, strategy='callback'
     )
-
-    # any parameter defined here is accessible as a class attribute
 
     def set_objective(self, A, reg, y):
         self.reg = reg
