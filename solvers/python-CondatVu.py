@@ -13,16 +13,18 @@ class Solver(BaseSolver):
     name = 'CondatVu'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=100, strategy='callback'
+        patience=20, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'eta': [0.5, 1],
                   'swap': [False]}
 
-    def set_objective(self, A, reg, y):
+    def set_objective(self, A, reg, y, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.delta = delta
+        self.data_fit = data_fit
 
     def run(self, callback):
         len_y = len(self.y)

@@ -18,9 +18,11 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'use_acceleration': [False, True]}
 
-    def set_objective(self, A, reg, y):
+    def set_objective(self, A, reg, y, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.delta = delta
+        self.data_fit = data_fit
 
     def run(self, callback):
         len_y = len(self.y)
@@ -28,7 +30,10 @@ class Solver(BaseSolver):
 
         # initialisation
         S = np.sum(self.A, axis=1)
-        c = (S @ self.y)/(S @ S)
+        if self.data_fit == 'quad':
+            c = (S @ self.y)/(S @ S)
+        else:
+            c = self.c_huber(S, self.delta, 100)
         u = c * np.ones(len_y)
         u_acc = u.copy()
         u_old = u.copy()
@@ -41,7 +46,7 @@ class Solver(BaseSolver):
                 u_old[:] = u
                 u[:] = u_acc
             u = ptv.tv1_1d(
-                u - stepsize * self.A.T @ (self.A @ u - self.y),
+                u - stepsize * self.grad(self.A, u),
                 self.reg * stepsize, method='condat')
             if self.use_acceleration:
                 u_acc[:] = u + (t_old - 1.) / t_new * (u - u_old)
@@ -49,3 +54,26 @@ class Solver(BaseSolver):
 
     def get_result(self):
         return self.u
+
+    def to_dict(self):
+        return dict(A=self.A, reg=self.reg, y=self.y)
+
+    def grad(self, A, u):
+        R = self.y - A @ u
+        if self.data_fit == 'quad':
+            return - A.T @ R
+        else:
+            return self.grad_huber(A, R, self.delta)
+
+    def grad_huber(self, A, R, delta):
+        return - A.T @ (np.where(np.abs(R) < delta, R, np.sign(R) * delta))
+
+    def c_huber(self, S, delta, niter):
+        list_c = np.linspace(min(self.y), max(self.y), niter)
+        diff = []
+        for c in list_c:
+            R = self.y - S * c
+            diff.append(abs((np.where(np.abs(R) < delta, self.y - c,
+                                      np.sign(R) * delta)).sum()))
+        index = diff.index(min(diff))
+        return list_c[index]
