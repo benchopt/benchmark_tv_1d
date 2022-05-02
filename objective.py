@@ -1,5 +1,6 @@
-import numpy as np
 from benchopt import BaseObjective
+import numpy as np
+from scipy import optimize
 
 
 class Objective(BaseObjective):
@@ -11,24 +12,12 @@ class Objective(BaseObjective):
                   # 'reg': np.linspace(0.1, 0.9, 3).round(1)
                   }
 
-    def __init__(self, reg=0.5, delta=100, data_fit='quad'):
-        self.reg = reg  # 0<reg<1
-        self.delta = delta
-        self.data_fit = data_fit
-
     def set_data(self, A, y):
         self.A = A
         self.y = y
         S = np.sum(self.A, axis=1)
-        L = np.tri(y.shape[0])
-        AL = self.A @ L
-        if self.data_fit == 'quad':
-            c = (S @ self.y)/(S @ S)
-            reg_max = np.max(abs(AL.T @ (S * c - self.y)))
-        else:
-            c = self.c_huber(S, self.delta, 100)
-            reg_max = self.reg_huber(AL, S, self.delta, c)
-        self.reg = self.reg*reg_max
+        self.c = self.set_c(S, self.delta)
+        self.reg = self.reg*self.set_reg_max(self.c)
 
     def compute(self, u):
         R = self.y - self.A @ u
@@ -38,8 +27,8 @@ class Objective(BaseObjective):
             return self.huber(R, self.delta) + self.reg*(abs(np.diff(u)).sum())
 
     def to_dict(self):
-        return dict(A=self.A, reg=self.reg, y=self.y, delta=self.delta,
-                    data_fit=self.data_fit)
+        return dict(A=self.A, reg=self.reg, y=self.y, c=self.c,
+                    delta=self.delta, data_fit=self.data_fit)
 
     def huber(self, R, delta):
         norm_1 = np.abs(R)
@@ -48,17 +37,37 @@ class Objective(BaseObjective):
                         delta * norm_1 - 0.5 * delta**2)
         return np.sum(loss)
 
-    def c_huber(self, S, delta, niter):
-        list_c = np.linspace(min(self.y), max(self.y), niter)
-        diff = []
-        for c in list_c:
-            R = self.y - S * c
-            diff.append(abs((np.where(np.abs(R) < delta, self.y - c,
-                                      np.sign(R) * delta)).sum()))
-        index = diff.index(min(diff))
-        return list_c[index]
+    def set_c(self, S, delta):
+        if self.data_fit == 'quad':
+            return self.c_quad(S)
+        else:
+            return self.c_huber(S, delta)
 
-    def reg_huber(self, AL, S, delta, c):
-        R = self.y - S * c
-        return np.max(abs(AL.T @ np.where(np.abs(R) < delta, R,
-                                          np.sign(R) * delta)))
+    def c_quad(self, S):
+        return (S @ self.y)/(S @ S)
+
+    def c_huber(self, S, delta):
+
+        def f(c):
+            R = self.y - S * c
+            return abs((np.where(np.abs(R) < delta, S * R,
+                        S * np.sign(R) * delta)).sum())
+        yS = self.y / S
+        return optimize.golden(f, brack=(min(yS), max(yS)))
+
+    def set_reg_max(self, c):
+        L = np.tri(self.y.shape[0])
+        AL = self.A @ L
+        z = np.zeros(self.y.shape[0])
+        z[0] = c
+        return np.max(abs(self.grad(AL, z)))
+
+    def grad(self, A, u):
+        R = self.y - A @ u
+        if self.data_fit == 'quad':
+            return - A.T @ R
+        else:
+            return - A.T @ self.grad_huber(R, self.delta)
+
+    def grad_huber(self, R, delta):
+        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)

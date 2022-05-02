@@ -15,9 +15,10 @@ class Solver(BaseSolver):
         patience=20, strategy='callback'
     )
 
-    def set_objective(self, A, reg, y, delta, data_fit):
+    def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
@@ -28,7 +29,7 @@ class Solver(BaseSolver):
         D = spdiags(data, diags, len_y-1, len_y)
         DA_inv = D @ np.linalg.pinv(self.A)
         v = np.zeros(len_y - 1)
-        u = np.zeros(len_y)
+        u = self.c * np.ones(len_y)
         stepsize = 1.99 / (np.linalg.norm(DA_inv, ord=2)**2)  # 1.99 / rho
         DA_invDA_invt = DA_inv @ DA_inv.T
         DA_invy = DA_inv @ self.y

@@ -26,9 +26,10 @@ class Solver(BaseSolver):
         'vol. 80, pp. 3321-3330 (2018)'
     ]
 
-    def set_objective(self, A, reg, y, delta, data_fit):
+    def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.c = c
         self.delta = delta
         self.data_fit = data_fit
 

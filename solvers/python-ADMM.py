@@ -19,9 +19,10 @@ class Solver(BaseSolver):
     parameters = {'gamma': [1.5, 1.9],
                   'update_pen': [False]}
 
-    def set_objective(self, A, reg, y, delta, data_fit):
+    def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
@@ -30,7 +31,7 @@ class Solver(BaseSolver):
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
         D = spdiags(data, diags, len_y-1, len_y)
-        u = np.zeros(len_y)
+        u = self.c * np.ones(len_y)
         z = np.zeros(len_y - 1)
         mu = np.zeros(len_y - 1)
         gamma = self.gamma

@@ -14,9 +14,10 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1., 1.5, 1.9]}
 
-    def set_objective(self, A, reg, y, delta, data_fit):
+    def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
@@ -26,13 +27,8 @@ class Solver(BaseSolver):
         AL = self.A @ L
         stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)  # alpha / rho
         # initialisation
-        S = np.sum(self.A, axis=1)
-        if self.data_fit == 'quad':
-            c = (S @ self.y)/(S @ S)
-        else:
-            c = self.c_huber(S, self.delta, 100)
         z = np.zeros(len_y)
-        z[0] = c
+        z[0] = self.c
         while callback(np.cumsum(z)):
             z = self.st(z - stepsize * self.grad(AL, z),
                         self.reg * stepsize)
@@ -52,17 +48,7 @@ class Solver(BaseSolver):
         if self.data_fit == 'quad':
             return - A.T @ R
         else:
-            return self.grad_huber(A, R, self.delta)
+            return - A.T @ self.grad_huber(R, self.delta)
 
-    def grad_huber(self, A, R, delta):
-        return - A.T @ (np.where(np.abs(R) < delta, R, np.sign(R) * delta))
-
-    def c_huber(self, S, delta, niter):
-        list_c = np.linspace(min(self.y), max(self.y), niter)
-        diff = []
-        for c in list_c:
-            R = self.y - S * c
-            diff.append(abs((np.where(np.abs(R) < delta, self.y - c,
-                                      np.sign(R) * delta)).sum()))
-        index = diff.index(min(diff))
-        return list_c[index]
+    def grad_huber(self, R, delta):
+        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
