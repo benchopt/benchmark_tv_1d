@@ -39,7 +39,7 @@ class Solver(BaseSolver):
 
     def st(self, w, mu):
         w0 = w[0]
-        w -= np.sign(w) * abs(np.clip(w, -mu, mu))
+        w -= np.clip(w, -mu, mu)
         w[0] = w0
         return w
 

@@ -14,6 +14,11 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.9]}
 
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if data_fit == 'huber':
+            return True, "solver does not work with huber loss"
+        return False, None
+
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
@@ -43,7 +48,7 @@ class Solver(BaseSolver):
 
     def st(self, w, mu):
         w0 = w[0]
-        w -= np.sign(w) * abs(np.clip(w, -mu, mu))
+        w -= np.clip(w, -mu, mu)
         w[0] = w0
         return w
 

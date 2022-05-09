@@ -19,6 +19,11 @@ class Solver(BaseSolver):
     parameters = {'gamma': [1.5, 1.9],
                   'update_pen': [False]}
 
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if data_fit == 'huber':
+            return True, "solver does not work with huber loss"
+        return False, None
+
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
@@ -59,5 +64,5 @@ class Solver(BaseSolver):
         return self.u
 
     def st(self, w, mu):
-        w -= np.sign(w) * abs(np.clip(w, -mu, mu))
+        w -= np.clip(w, -mu, mu)
         return w

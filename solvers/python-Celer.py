@@ -26,6 +26,11 @@ class Solver(BaseSolver):
         'vol. 80, pp. 3321-3330 (2018)'
     ]
 
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if data_fit == 'huber':
+            return True, "solver does not work with huber loss"
+        return False, None
+
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
@@ -51,8 +56,7 @@ class Solver(BaseSolver):
         self.lasso.max_iter = n_iter
         self.lasso.fit(AL_new, y_new)
         z = self.lasso.coef_.flatten()
-        c = S @ (self.y - AL @ z) / (S @ S)
-        self.u = np.r_[0, np.cumsum(z)] + c
+        self.u = np.r_[0, np.cumsum(z)] + self.c
 
     @staticmethod
     def get_next(previous):

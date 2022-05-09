@@ -15,6 +15,11 @@ class Solver(BaseSolver):
         patience=20, strategy='callback'
     )
 
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if data_fit == 'huber':
+            return True, "solver does not work with huber loss"
+        return False, None
+
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
