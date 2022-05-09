@@ -1,6 +1,9 @@
 from benchopt import BaseObjective
-import numpy as np
-from scipy import optimize
+from benchopt import safe_import_context
+
+with safe_import_context() as import_ctx:
+    import numpy as np
+    from scipy import optimize
 
 
 class Objective(BaseObjective):
@@ -16,8 +19,8 @@ class Objective(BaseObjective):
         self.A = A
         self.y = y
         S = np.sum(self.A, axis=1)
-        self.c = self.set_c(S, self.delta)
-        self.reg = self.reg*self.set_reg_max(self.c)
+        self.c = self.get_c(S, self.delta)
+        self.reg = self.reg*self.get_reg_max(self.c)
 
     def compute(self, u):
         R = self.y - self.A @ u
@@ -37,7 +40,7 @@ class Objective(BaseObjective):
                         delta * norm_1 - 0.5 * delta**2)
         return np.sum(loss)
 
-    def set_c(self, S, delta):
+    def get_c(self, S, delta):
         if self.data_fit == 'quad':
             return self.c_quad(S)
         else:
@@ -47,15 +50,13 @@ class Objective(BaseObjective):
         return (S @ self.y)/(S @ S)
 
     def c_huber(self, S, delta):
-
         def f(c):
             R = self.y - S * c
-            return abs((np.where(np.abs(R) < delta, S * R,
-                        S * np.sign(R) * delta)).sum())
+            return abs(self.grad_huber(R, delta).sum())
         yS = self.y / S
         return optimize.golden(f, brack=(min(yS), max(yS)))
 
-    def set_reg_max(self, c):
+    def get_reg_max(self, c):
         L = np.tri(self.y.shape[0])
         AL = self.A @ L
         z = np.zeros(self.y.shape[0])
