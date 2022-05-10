@@ -22,7 +22,7 @@ class Solver(BaseSolver):
     )
 
     install_cmd = 'conda'
-    requirements = ['pip:skglm']
+    requirements = ["pip:git+https://github.com/EnLAI111/skglm@Huber_datafit"]
     references = [
         'M. Massias, A. Gramfort and J. Salmon, ICML, '
         '"Celer: a Fast Solver for the Lasso with Dual Extrapolation", '
