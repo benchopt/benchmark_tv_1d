@@ -37,12 +37,12 @@ class Solver(BaseSolver):
             if self.fast:
                 z_old = z
                 z = self.st(v - stepsize * self.grad(AL, z),
-                        self.reg * stepsize)
+                            self.reg * stepsize)
                 v = z + (n - 1)/(n + self.a) * (z - z_old)
                 n += 1
             else:
                 z = self.st(z - stepsize * self.grad(AL, z),
-                        self.reg * stepsize)
+                            self.reg * stepsize)
         self.u = np.cumsum(z)
 
     def get_result(self):
