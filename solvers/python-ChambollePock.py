@@ -5,7 +5,6 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
-    from scipy import optimize
 
 
 class Solver(BaseSolver):
