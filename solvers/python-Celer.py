@@ -13,7 +13,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Coordinate descent for synthesis formulation as lasso problem."""
-    name = 'Celer'
+    name = 'Celer synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=10, strategy='iteration'
@@ -56,7 +56,8 @@ class Solver(BaseSolver):
         self.lasso.max_iter = n_iter
         self.lasso.fit(AL_new, y_new)
         z = self.lasso.coef_.flatten()
-        self.u = np.r_[0, np.cumsum(z)] + self.c
+        c = S @ (self.y - AL @ z) / (S @ S)
+        self.u = np.r_[0, np.cumsum(z)] + c
 
     @staticmethod
     def get_next(previous):

@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Dual Projected gradient descent for synthesis formulation."""
-    name = 'DPGD'
+    name = 'DPGD synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'

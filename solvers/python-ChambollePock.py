@@ -9,8 +9,8 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Dual Projected gradient descent for synthesis formulation."""
-    name = 'ChamPoke'
+    """A first-order primal-dual algorithm for synthesis formulation."""
+    name = 'ChambollePock analysis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'
@@ -19,6 +19,11 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'sigma': [0.5],
                   'theta': [1.]}
+
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if data_fit == 'huber':
+            return True, "solver does not work with huber loss"
+        return False, None
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -44,21 +49,7 @@ class Solver(BaseSolver):
             u_old = u
             v = np.clip(v + self.sigma * D @ u_bar, -self.reg, self.reg)
             u_tmp = u - tau * D.T @ v
-
-            if self.data_fit == 'quad':
-                u = I_tauAtA_inv @ (tauAty + u_tmp)
-            else:
-                u_new = I_tauAtA_inv @ (tauAty + u_tmp)
-                R = self.y - self.A @ u_new
-
-                def f(u):
-                    return abs(u - u_tmp - tau * self.delta * self.A.T @
-                               np.sign(self.y - self.A @ u)).sum()
-
-                u = np.where(np.abs(R) < self.delta,
-                             u_new,
-                             optimize.minimize(f, u).x)
-
+            u = I_tauAtA_inv @ (tauAty + u_tmp)
             u_bar = u + self.theta * (u - u_old)
         self.u = u
 

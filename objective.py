@@ -12,7 +12,6 @@ class Objective(BaseObjective):
     parameters = {'reg': [0.5],
                   'delta': [0.9],
                   'data_fit': ['quad', 'huber']
-                  # 'reg': np.linspace(0.1, 0.9, 3).round(1)
                   }
 
     def set_data(self, A, y):

@@ -7,7 +7,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Proximal gradient descent for synthesis formulation."""
-    name = 'ISTA'
+    name = 'ISTA synthesis'
 
     stopping_strategy = 'callback'
 

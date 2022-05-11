@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Alternating direction method for synthesis and analysis formulation."""
-    name = 'ADMM'
+    name = 'ADMM analysis and synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'

@@ -10,7 +10,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Primal-Dual Splitting Method for synthesis and analysis formulation."""
-    name = 'CondatVu'
+    name = 'CondatVu analysis and synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'
