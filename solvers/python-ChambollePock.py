@@ -8,12 +8,16 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Dual Projected gradient descent for synthesis formulation."""
-    name = 'DPGD synthesis'
+    """A first-order primal-dual algorithm for synthesis formulation."""
+    name = 'ChambollePock analysis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'
     )
+
+    # any parameter defined here is accessible as a class attribute
+    parameters = {'sigma': [0.5],
+                  'theta': [1.]}
 
     def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
@@ -32,19 +36,20 @@ class Solver(BaseSolver):
         data = np.array([np.ones(len_y), -np.ones(len_y)])
         diags = np.array([0, 1])
         D = spdiags(data, diags, len_y-1, len_y)
-        DA_inv = D @ np.linalg.pinv(self.A)
+        tau = 1. / (np.linalg.norm(self.A, ord=2)**2)
+        I_tauAtA_inv = np.linalg.pinv(np.identity(
+            len_y) + tau * self.A.T @ self.A)
+        tauAty = tau * self.A.T @ self.y
         v = np.zeros(len_y - 1)
         u = self.c * np.ones(len_y)
-        stepsize = 1.99 / (np.linalg.norm(DA_inv, ord=2)**2)  # 1.99 / rho
-        DA_invDA_invt = DA_inv @ DA_inv.T
-        DA_invy = DA_inv @ self.y
-        AtA_inv = np.linalg.pinv(self.A.T @ self.A)
-        Aty = self.A.T @ self.y
+        u_bar = u
 
         while callback(u):
-            v -= stepsize * (DA_invDA_invt @ v - DA_invy)
-            v = np.clip(v, -self.reg, self.reg)
-            u = AtA_inv @ (Aty - D.T @ v)
+            u_old = u
+            v = np.clip(v + self.sigma * D @ u_bar, -self.reg, self.reg)
+            u_tmp = u - tau * D.T @ v
+            u = I_tauAtA_inv @ (tauAty + u_tmp)
+            u_bar = u + self.theta * (u - u_old)
         self.u = u
 
     def get_result(self):

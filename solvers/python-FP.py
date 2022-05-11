@@ -6,13 +6,18 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Proximal gradient descent for synthesis formulation."""
-    name = 'ISTA synthesis'
+    """Fixed point with block updates for synthesis formulation."""
+    name = 'FP synthesis'
 
     stopping_strategy = 'callback'
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'alpha': [1., 1.5, 1.9]}
+    parameters = {'alpha': [1.9]}
+
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if data_fit == 'huber':
+            return True, "solver does not work with huber loss"
+        return False, None
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -25,13 +30,17 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         L = np.tri(len_y)
         AL = self.A @ L
-        stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)  # alpha / rho
+        # alpha / rho
+        stepsize = self.alpha / (len_y * np.max((AL**2).sum(axis=1)))
         # initialisation
         z = np.zeros(len_y)
         z[0] = self.c
+        mu = np.zeros((len_y, len_y))
+        nu = np.zeros(len_y)
         while callback(np.cumsum(z)):
-            z = self.st(z - stepsize * self.grad(AL, z),
-                        self.reg * stepsize)
+            mu = z - stepsize * (len_y * (AL @ z - self.y) * AL.T).T
+            nu = np.mean(mu, axis=0)
+            z = self.st(nu, stepsize * self.reg)
         self.u = np.cumsum(z)
 
     def get_result(self):

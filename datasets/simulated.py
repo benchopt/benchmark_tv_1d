@@ -1,5 +1,8 @@
-import numpy as np
 from benchopt import BaseDataset
+from benchopt import safe_import_context
+
+with safe_import_context() as import_ctx:
+    import numpy as np
 
 
 class Dataset(BaseDataset):
@@ -12,7 +15,7 @@ class Dataset(BaseDataset):
     parameters = {
         'sigma': [0.1],
         'mu': [0],
-        'K': [50],
+        'K': [500],
         'type_A': ['identity', 'diagonal', 'triangular', 'random']}
 
     def __init__(self, mu=0, sigma=0.3, K=10,
@@ -32,7 +35,7 @@ class Dataset(BaseDataset):
         elif self.type_A == 'random':
             A = rng.randn(self.K, self.K)
         else:
-            A = np.eye(self.K, dtype=float)
+            A = np.identity(self.K)
         return A
 
     def get_data(self):
