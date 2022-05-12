@@ -17,7 +17,7 @@ class Solver(BaseSolver):
 
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'ratio': [10.],
+    parameters = {'ratio': [1.],
                   'theta': [1.]}
 
     def skip(self, A, reg, y, c, delta, data_fit):
@@ -41,10 +41,9 @@ class Solver(BaseSolver):
         sigma_w = 1. / (self.ratio * np.sqrt(Lh))
         # Init variables
         n, p = self.A.shape
-        len_y = len(self.y)
-        u = self.c * np.ones(p)
+        u = np.zeros(p)
         v = np.zeros(p - 1) # we consider non-cyclic finite difference
-        w = np.zeros(p)
+        w = np.zeros(n)
         u_bar = u
 
         while callback(u):
