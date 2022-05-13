@@ -42,7 +42,8 @@ class Solver(BaseSolver):
         DA_invy = DA_inv @ self.y
         AtA_inv = np.linalg.pinv(self.A.T @ self.A)
         Aty = self.A.T @ self.y
-        stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)  # alpha / rho
+        # alpha / rho
+        stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)
         # initialisation
         u = self.c * np.ones(len_y)
         v = pinv(D.T.todense()) @ (self.y - self.A.T @ self.A @ u)
@@ -56,7 +57,8 @@ class Solver(BaseSolver):
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
                 v_old[:] = v
                 v[:] = v_acc
-            v = np.clip(v - stepsize * (DA_invDA_invt @ v - DA_invy), -self.reg, self.reg)
+            v = np.clip(v - stepsize * (DA_invDA_invt @ v - DA_invy),
+                        -self.reg, self.reg)
             if self.use_acceleration:
                 v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
             u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))

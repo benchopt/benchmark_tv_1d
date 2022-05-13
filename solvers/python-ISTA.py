@@ -26,7 +26,8 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         L = np.tri(len_y)
         AL = self.A @ L
-        stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)  # alpha / rho
+        # alpha / rho
+        stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)
         # initialisation
         z = np.zeros(len_y)
         z[0] = self.c

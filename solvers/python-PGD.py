@@ -28,7 +28,8 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
-        stepsize = self.alpha / (np.linalg.norm(self.A, ord=2)**2)  # alpha / rho
+        # alpha / rho
+        stepsize = self.alpha / (np.linalg.norm(self.A, ord=2)**2)
         # initialisation
         u = self.c * np.ones(len_y)
         u_acc = u.copy()
