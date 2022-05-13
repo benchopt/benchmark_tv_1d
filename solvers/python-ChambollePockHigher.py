@@ -16,7 +16,7 @@ class Solver(BaseSolver):
         strategy="callback")
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {"ratio": [1.0],
+    parameters = {"ratio": [10.0],
                   "theta": [1.0]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
@@ -42,7 +42,7 @@ class Solver(BaseSolver):
 
         while callback(u):
             u_old = u
-            v = np.clip(v + sigma_v * np.diff(u_bar), -self.reg, self.reg)
+            v = np.clip(v + sigma_v * np.diff(u_bar), -self.reg*tau, self.reg*tau)
             w_tmp = w + sigma_w * self.A @ u_bar
             if self.data_fit == "huber":
                 # Use Moreau identity + translation rule
