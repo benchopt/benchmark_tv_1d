@@ -7,12 +7,12 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """A first-order primal-dual algorithm for analysis formulation."""
+    """Chambolle-Pock (or PDHG) on higher dual (PD-Split) for analysis formulation."""
 
-    name = "Chambolle-Pock (higher dualization) analysis"
+    name = "Chambolle-Pock PD-split (analysis)"
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=20,
+        patience=40,
         strategy="callback")
 
     # any parameter defined here is accessible as a class attribute
