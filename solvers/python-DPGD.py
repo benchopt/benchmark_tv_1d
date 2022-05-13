@@ -4,6 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    from scipy.sparse import spdiags
+    from scipy.linalg import pinv
 
 
 class Solver(BaseSolver):
@@ -13,6 +15,10 @@ class Solver(BaseSolver):
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'
     )
+
+    # any parameter defined here is accessible as a class attribute
+    parameters = {'alpha': [1.],
+                  'use_acceleration': [False, True]}
 
     def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
@@ -28,18 +34,31 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
+        data = np.array([-np.ones(len_y), np.ones(len_y)])
+        diags = np.array([0, 1])
+        D = spdiags(data, diags, len_y-1, len_y)
         DA_inv = np.diff(np.linalg.pinv(self.A), axis=0)
-        v = np.zeros(len_y - 1)
-        u = self.c * np.ones(len_y)
-        stepsize = 1.99 / (np.linalg.norm(DA_inv, ord=2)**2)  # 1.99 / rho
         DA_invDA_invt = DA_inv @ DA_inv.T
         DA_invy = DA_inv @ self.y
         AtA_inv = np.linalg.pinv(self.A.T @ self.A)
         Aty = self.A.T @ self.y
+        stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)  # alpha / rho
+        # initialisation
+        u = self.c * np.ones(len_y)
+        v = pinv(D.T.todense()) @ (self.y - self.A.T @ self.A @ u)
+        v_old = v.copy()
+        v_acc = v.copy()
 
+        t_new = 1
         while callback(u):
-            v -= stepsize * (DA_invDA_invt @ v - DA_invy)
-            v = np.clip(v, -self.reg, self.reg)
+            if self.use_acceleration:
+                t_old = t_new
+                t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
+                v_old[:] = v
+                v[:] = v_acc
+            v = np.clip(v - stepsize * (DA_invDA_invt @ v - DA_invy), -self.reg, self.reg)
+            if self.use_acceleration:
+                v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
             u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
         self.u = u
 

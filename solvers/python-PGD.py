@@ -16,7 +16,8 @@ class Solver(BaseSolver):
     stopping_strategy = "callback"
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'use_acceleration': [False, True]}
+    parameters = {'alpha': [1.],
+                  'use_acceleration': [False, True]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -27,8 +28,7 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
-        stepsize = 1 / (np.linalg.norm(self.A, ord=2)**2)  # 1/ rho
-
+        stepsize = self.alpha / (np.linalg.norm(self.A, ord=2)**2)  # alpha / rho
         # initialisation
         u = self.c * np.ones(len_y)
         u_acc = u.copy()

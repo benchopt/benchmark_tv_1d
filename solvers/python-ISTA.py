@@ -12,9 +12,8 @@ class Solver(BaseSolver):
     stopping_strategy = 'callback'
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'alpha': [1., 1.5, 1.9],
-                  'fast': [False, True],
-                  'a': [2]}
+    parameters = {'alpha': [1.9],
+                  'use_acceleration': [False, True]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -31,18 +30,20 @@ class Solver(BaseSolver):
         # initialisation
         z = np.zeros(len_y)
         z[0] = self.c
-        v = z
-        n = 1
+        z_old = z.copy()
+        z_acc = z.copy()
+
+        t_new = 1
         while callback(np.cumsum(z)):
-            if self.fast:
-                z_old = z
-                z = self.st(v - stepsize * self.grad(AL, z),
-                            self.reg * stepsize)
-                v = z + (n - 1)/(n + self.a) * (z - z_old)
-                n += 1
-            else:
-                z = self.st(z - stepsize * self.grad(AL, z),
-                            self.reg * stepsize)
+            if self.use_acceleration:
+                t_old = t_new
+                t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
+                z_old[:] = z
+                z[:] = z_acc
+            z = self.st(z - stepsize * self.grad(AL, z),
+                        self.reg * stepsize)
+            if self.use_acceleration:
+                z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
         self.u = np.cumsum(z)
 
     def get_result(self):
