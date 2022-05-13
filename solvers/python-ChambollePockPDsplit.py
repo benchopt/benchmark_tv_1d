@@ -7,7 +7,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Chambolle-Pock (or PDHG) on higher dual (PD-Split) for analysis formulation."""
+    """Chambolle-Pock (or PDHG) on higher dual (PD-Split) for analysis."""
 
     name = "Chambolle-Pock PD-split (analysis)"
 
