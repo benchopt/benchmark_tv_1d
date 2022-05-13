@@ -48,13 +48,15 @@ class Solver(BaseSolver):
 
         while callback(u):
             z_old = z
-            u = np.ravel(A_tmp @ (Aty + np.diff(mu, append=0, prepend=0) - gamma * np.diff(z, append=0, prepend=0)))
+            u = np.ravel(A_tmp @ (Aty + np.diff(mu, append=0, prepend=0)
+                                  - gamma * np.diff(z, append=0, prepend=0)))
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
             if self.update_pen:
                 r = np.linalg.norm(np.diff(u) - z, ord=2)
-                s = np.linalg.norm(gamma * np.diff(z - z_old, append=0, prepend=0), ord=2)
+                s = np.linalg.norm(
+                    gamma * np.diff(z - z_old, append=0, prepend=0), ord=2)
                 if r > 10 * s:
                     gamma *= 2
                 if s > 10 * r:
