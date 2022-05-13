@@ -5,6 +5,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
+    from scipy.linalg import pinv
 
 
 class Solver(BaseSolver):
@@ -17,7 +18,7 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'gamma': [1.5, 1.9],
-                  'update_pen': [True, False]}
+                  'update_pen': [False]}
 
     def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
@@ -38,7 +39,7 @@ class Solver(BaseSolver):
         D = spdiags(data, diags, len_y-1, len_y)
         u = self.c * np.ones(len_y)
         z = np.zeros(len_y - 1)
-        mu = np.zeros(len_y - 1)
+        mu = pinv(D.T.todense()) @ (self.y - self.A.T @ self.A @ u)
         gamma = self.gamma
         AtA = self.A.T @ self.A
         DtD = D.T @ D
