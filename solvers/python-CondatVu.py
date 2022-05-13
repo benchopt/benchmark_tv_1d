@@ -5,7 +5,6 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
-    from scipy.linalg import pinv
     from scipy.sparse.linalg import norm as spnorm
 
 
@@ -37,7 +36,7 @@ class Solver(BaseSolver):
 
         # initialisation
         u = self.c * np.ones(len_y)
-        v = pinv(D.T.todense()) @ (self.y - self.A.T @ self.A @ u)
+        v = np.zeros(len_y - 1)
         w = np.r_[v, self.A @ u]
         w_tmp = w
 

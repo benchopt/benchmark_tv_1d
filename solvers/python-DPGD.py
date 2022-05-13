@@ -4,8 +4,6 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    from scipy.sparse import spdiags
-    from scipy.linalg import pinv
 
 
 class Solver(BaseSolver):
@@ -34,9 +32,6 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
-        data = np.array([-np.ones(len_y), np.ones(len_y)])
-        diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
         DA_inv = np.diff(np.linalg.pinv(self.A), axis=0)
         DA_invDA_invt = DA_inv @ DA_inv.T
         DA_invy = DA_inv @ self.y
@@ -46,7 +41,7 @@ class Solver(BaseSolver):
         stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)
         # initialisation
         u = self.c * np.ones(len_y)
-        v = pinv(D.T.todense()) @ (self.y - self.A.T @ self.A @ u)
+        v = np.zeros(len_y - 1)
         v_old = v.copy()
         v_acc = v.copy()
 

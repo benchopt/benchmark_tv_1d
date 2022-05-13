@@ -4,8 +4,6 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    from scipy.sparse import spdiags
-    from scipy.linalg import pinv
 
 
 class Solver(BaseSolver):
@@ -34,15 +32,12 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         len_y = len(self.y)
-        data = np.array([-np.ones(len_y), np.ones(len_y)])
-        diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
         tau = 1. / (np.linalg.norm(self.A, ord=2)**2)
         I_tauAtA_inv = np.linalg.pinv(np.identity(
             len_y) + tau * self.A.T @ self.A)
         tauAty = tau * self.A.T @ self.y
         u = self.c * np.ones(len_y)
-        v = pinv(D.T.todense()) @ (self.y - self.A.T @ self.A @ u)
+        v = np.zeros(len_y - 1)
         u_bar = u
 
         while callback(u):
