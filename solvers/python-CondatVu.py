@@ -17,8 +17,7 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'eta': [0.5, 1],
-                  'swap': [False]}
+    parameters = {'eta': [0.5, 1]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -51,20 +50,12 @@ class Solver(BaseSolver):
 
         while callback(u):
             if self.data_fit == 'quad':
-                if self.swap:
-                    v_tmp = v + sigma * np.diff(u) - \
-                        sigma * self.st(v / sigma + np.diff(u),
-                                        self.reg / sigma)
-                    u_tmp = u - tau * \
-                        self.A.T @ (self.A @ u - self.y) - \
-                        tau * (-np.diff(2 * v_tmp - v, append=0, prepend=0))
-                else:
-                    u_tmp = u - tau * self.A.T @ (self.A @ u - self.y) - \
-                            tau * (-np.diff(v, append=0, prepend=0))
-                    v_tmp = v + sigma * np.diff(2 * u_tmp - u) - \
-                        sigma * self.st(v / sigma +
-                                        np.diff(2 * u_tmp - u),
-                                        self.reg / sigma)
+                u_tmp = u - tau * self.A.T @ (self.A @ u - self.y) - \
+                    tau * (-np.diff(v, append=0, prepend=0))
+                v_tmp = v + sigma * np.diff(2 * u_tmp - u) - \
+                    sigma * self.st(v / sigma +
+                                    np.diff(2 * u_tmp - u),
+                                    self.reg / sigma)
                 u = eta * u_tmp + (1 - eta)*u
                 v = eta * v_tmp + (1 - eta)*v
             else:
