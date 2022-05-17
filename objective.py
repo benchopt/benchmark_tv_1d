@@ -29,11 +29,11 @@ class Objective(BaseObjective):
             return self.huber(R, self.delta) \
                 + self.reg_scaled*(abs(np.diff(u)).sum())
 
-    # def get_one_solution(self):
-    #     return np.zeros(self.A.shape[1])
+    def get_one_solution(self):
+        return np.zeros(self.A.shape[1])
 
     def to_dict(self):
-        return dict(A=self.A, reg=self.reg, y=self.y, c=self.c,
+        return dict(A=self.A, reg_scaled=self.reg_scaled, y=self.y, c=self.c,
                     delta=self.delta, data_fit=self.data_fit)
 
     def huber(self, R, delta):
