@@ -7,7 +7,7 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
-    name = "Ordinary Least Squares"
+    name = "TV1D"
 
     parameters = {'reg': [0.5],
                   'delta': [0.9],
@@ -27,6 +27,9 @@ class Objective(BaseObjective):
             return .5 * R @ R + self.reg*(abs(np.diff(u)).sum())
         else:
             return self.huber(R, self.delta) + self.reg*(abs(np.diff(u)).sum())
+
+    # def get_one_solution(self):
+    #     return np.zeros(self.A.shape[1])
 
     def to_dict(self):
         return dict(A=self.A, reg=self.reg, y=self.y, c=self.c,
