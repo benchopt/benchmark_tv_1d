@@ -19,14 +19,15 @@ class Objective(BaseObjective):
         self.y = y
         S = np.sum(self.A, axis=1)
         self.c = self.get_c(S, self.delta)
-        self.reg = self.reg*self.get_reg_max(self.c)
+        self.reg_scaled = self.reg*self.get_reg_max(self.c)
 
     def compute(self, u):
         R = self.y - self.A @ u
         if self.data_fit == 'quad':
-            return .5 * R @ R + self.reg*(abs(np.diff(u)).sum())
+            return .5 * R @ R + self.reg_scaled*(abs(np.diff(u)).sum())
         else:
-            return self.huber(R, self.delta) + self.reg*(abs(np.diff(u)).sum())
+            return self.huber(R, self.delta) \
+                + self.reg_scaled*(abs(np.diff(u)).sum())
 
     # def get_one_solution(self):
     #     return np.zeros(self.A.shape[1])
