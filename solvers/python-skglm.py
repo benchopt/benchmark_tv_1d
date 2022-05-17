@@ -30,8 +30,8 @@ class Solver(BaseSolver):
         'vol. 80, pp. 3321-3330 (2018)'
     ]
 
-    def set_objective(self, A, reg, y, c, delta, data_fit):
-        self.reg = reg
+    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
+        self.reg_scaled = reg_scaled
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -44,7 +44,7 @@ class Solver(BaseSolver):
         if data_fit == 'quad':
             self.clf = GeneralizedLinearEstimator(
                 Quadratic(),
-                WeightedL1(self.reg / self.y.shape[0], weights),
+                WeightedL1(self.reg_scaled / self.y.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-12, fit_intercept=False,
@@ -53,7 +53,7 @@ class Solver(BaseSolver):
         else:
             self.clf = GeneralizedLinearEstimator(
                 Huber(self.delta),
-                WeightedL1(self.reg / self.y.shape[0], weights),
+                WeightedL1(self.reg_scaled / self.y.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-12, fit_intercept=False,

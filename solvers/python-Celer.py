@@ -26,13 +26,13 @@ class Solver(BaseSolver):
         'vol. 80, pp. 3321-3330 (2018)'
     ]
 
-    def skip(self, A, reg, y, c, delta, data_fit):
+    def skip(self, A, reg_scaled, y, c, delta, data_fit):
         if data_fit == 'huber':
             return True, "solver does not work with huber loss"
         return False, None
 
-    def set_objective(self, A, reg, y, c, delta, data_fit):
-        self.reg = reg
+    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
+        self.reg_scaled = reg_scaled
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -40,7 +40,8 @@ class Solver(BaseSolver):
 
         warnings.filterwarnings('ignore', category=ConvergenceWarning)
         self.lasso = Lasso(
-            alpha=self.reg / self.y.shape[0], max_iter=1, max_epochs=100000,
+            alpha=self.reg_scaled / self.y.shape[0], max_iter=1,
+            max_epochs=100000,
             tol=1e-12, prune=True, fit_intercept=False,
             warm_start=False, positive=False, verbose=False,
         )
