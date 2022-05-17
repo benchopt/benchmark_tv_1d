@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """A first-order primal-dual algorithm for synthesis formulation."""
-    name = 'ChambollePock analysis'
+    name = 'Chambolle-Pock analysis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=20, strategy='callback'
