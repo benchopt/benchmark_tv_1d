@@ -5,12 +5,11 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
-    from scipy.sparse.linalg import norm as spnorm
 
 
 class Solver(BaseSolver):
-    """Primal-Dual Splitting Method for synthesis and analysis formulation."""
-    name = 'CondatVu analysis and synthesis'
+    """Primal-Dual Splitting Method for analysis formulation."""
+    name = 'CondatVu analysis'
 
     stopping_criterion = SufficientProgressCriterion(
         patience=40, strategy='callback'
@@ -30,8 +29,8 @@ class Solver(BaseSolver):
         len_y = len(self.y)
         data = np.array([-np.ones(len_y), np.ones(len_y)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
-        K = np.r_[D.toarray(), self.A]
+        D = spdiags(data, diags, len_y-1, len_y).toarray()
+        K = np.r_[D, self.A]
 
         # initialisation
         u = self.c * np.ones(len_y)
@@ -44,7 +43,7 @@ class Solver(BaseSolver):
 
         if self.data_fit == 'quad':
             tau = 1 / (np.linalg.norm(self.A.T @ self.A, ord=2) /
-                       2 + sigma * spnorm(D)**2)
+                       2 + sigma * np.linalg.norm(D, ord=2) ** 2)
         else:
             tau = 1 / (sigma * np.linalg.norm(K, ord=2)**2)
 

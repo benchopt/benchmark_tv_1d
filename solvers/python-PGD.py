@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Proximal gradient descent for analysis formulation."""
-    name = 'PGD synthesis'
+    name = 'Primal PGD analysis'
 
     install_cmd = 'conda'
     requirements = ['pip:prox-tv']
