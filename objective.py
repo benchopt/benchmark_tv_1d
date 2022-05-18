@@ -60,9 +60,9 @@ class Objective(BaseObjective):
         return optimize.golden(f, brack=(min(yS), max(yS)))
 
     def get_reg_max(self, c):
-        L = np.tri(self.y.shape[0])
+        L = np.tri(self.A.shape[1])
         AL = self.A @ L
-        z = np.zeros(self.y.shape[0])
+        z = np.zeros(self.A.shape[1])
         z[0] = c
         return np.max(abs(self.grad(AL, z)))
 

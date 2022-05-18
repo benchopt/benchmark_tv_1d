@@ -31,7 +31,7 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
+        n, p = self.A.shape
         DA_inv = np.diff(np.linalg.pinv(self.A), axis=0)
         DA_invDA_invt = DA_inv @ DA_inv.T
         DA_invy = DA_inv @ self.y
@@ -40,8 +40,8 @@ class Solver(BaseSolver):
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)
         # initialisation
-        u = self.c * np.ones(len_y)
-        v = np.zeros(len_y - 1)
+        u = self.c * np.ones(p)
+        v = np.zeros(p - 1)
         v_old = v.copy()
         v_acc = v.copy()
 

@@ -23,13 +23,13 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        L = np.tri(len_y)
+        p = self.A.shape[1]
+        L = np.tri(p)
         AL = self.A @ L
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)
         # initialisation
-        z = np.zeros(len_y)
+        z = np.zeros(p)
         z[0] = self.c
         z_old = z.copy()
         z_acc = z.copy()

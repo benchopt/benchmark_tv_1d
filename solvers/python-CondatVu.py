@@ -26,15 +26,15 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        data = np.array([-np.ones(len_y), np.ones(len_y)])
+        n, p = self.A.shape
+        data = np.array([-np.ones(p), np.ones(p)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y).toarray()
+        D = spdiags(data, diags, p-1, p).toarray()
         K = np.r_[D, self.A]
 
         # initialisation
-        u = self.c * np.ones(len_y)
-        v = np.zeros(len_y - 1)
+        u = self.c * np.ones(p)
+        v = np.zeros(p - 1)
         w = np.r_[v, self.A @ u]
         w_tmp = w
 
@@ -61,15 +61,15 @@ class Solver(BaseSolver):
                 u_tmp = u - tau * K.T @ w
 
                 x_tmp = w + sigma * K @ (2 * u_tmp - u)
-                w_tmp[:len_y - 1] = x_tmp[:len_y - 1] - \
-                    sigma * self.st(x_tmp[:len_y - 1] /
+                w_tmp[:p - 1] = x_tmp[:p - 1] - \
+                    sigma * self.st(x_tmp[:p - 1] /
                                     sigma, self.reg_scaled / sigma)
-                R_tmp = sigma * self.y - x_tmp[len_y - 1:]
-                w_tmp[len_y - 1:] = x_tmp[len_y - 1:] - \
+                R_tmp = sigma * self.y - x_tmp[p - 1:]
+                w_tmp[p - 1:] = x_tmp[p - 1:] - \
                     np.where(abs(R_tmp) < self.delta * (sigma + 1),
                              sigma *
-                             (self.y + x_tmp[len_y - 1:]) / (sigma + 1),
-                             x_tmp[len_y - 1:] + self.delta * np.sign(R_tmp))
+                             (self.y + x_tmp[p - 1:]) / (sigma + 1),
+                             x_tmp[p - 1:] + self.delta * np.sign(R_tmp))
                 u = eta * u_tmp + (1 - eta)*u
                 w = eta * w_tmp + (1 - eta)*w
         self.u = u

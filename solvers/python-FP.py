@@ -27,18 +27,18 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        L = np.tri(len_y)
+        n, p = self.A.shape
+        L = np.tri(p)
         AL = self.A @ L
         # alpha / rho
-        stepsize = self.alpha / (len_y * np.max((AL**2).sum(axis=1)))
+        stepsize = self.alpha / (n * np.max((AL**2).sum(axis=1)))
         # initialisation
-        z = np.zeros(len_y)
+        z = np.zeros(p)
         z[0] = self.c
-        mu = np.zeros((len_y, len_y))
-        nu = np.zeros(len_y)
+        mu = np.zeros((p, p))
+        nu = np.zeros(p)
         while callback(np.cumsum(z)):
-            mu = z - stepsize * (len_y * (AL @ z - self.y) * AL.T).T
+            mu = z - stepsize * (n * (AL @ z - self.y) * AL.T).T
             nu = np.mean(mu, axis=0)
             z = self.st(nu, stepsize * self.reg_scaled)
         self.u = np.cumsum(z)

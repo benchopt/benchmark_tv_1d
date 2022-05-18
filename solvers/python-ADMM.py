@@ -32,13 +32,13 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        data = np.array([-np.ones(len_y), np.ones(len_y)])
+        p = self.A.shape[1]
+        data = np.array([-np.ones(p), np.ones(p)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
-        u = self.c * np.ones(len_y)
-        z = np.zeros(len_y - 1)
-        mu = np.zeros(len_y - 1)
+        D = spdiags(data, diags, p-1, p)
+        u = self.c * np.ones(p)
+        z = np.zeros(p - 1)
+        mu = np.zeros(p - 1)
         gamma = self.gamma
         AtA = self.A.T @ self.A
         DtD = D.T @ D

@@ -27,18 +27,18 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        data = np.array([-np.ones(len_y), np.ones(len_y)])
+        p = self.A.shape[1]
+        data = np.array([-np.ones(p), np.ones(p)])
         diags = np.array([0, 1])
-        D = spdiags(data, diags, len_y-1, len_y)
+        D = spdiags(data, diags, p-1, p)
         tau = 1. / (np.linalg.norm(self.A, ord=2)**2)
         I_tauAtA_inv = np.linalg.pinv(np.identity(
-            len_y) + tau * self.A.T @ self.A)
+            p) + tau * self.A.T @ self.A)
         tauAty = tau * self.A.T @ self.y
         K = np.r_[D.toarray(), self.A]
 
-        u = self.c * np.ones(len_y)
-        v = np.zeros(len_y - 1)
+        u = self.c * np.ones(p)
+        v = np.zeros(p - 1)
         w = np.r_[v, self.A @ u]
         u_bar = u
 
@@ -52,15 +52,15 @@ class Solver(BaseSolver):
                 u = I_tauAtA_inv @ (tauAty + u_tmp)
             else:
                 x = w + self.sigma * K @ u_bar
-                w[:len_y - 1] = x[:len_y - 1] - self.sigma * \
-                    self.st(x[:len_y - 1] / self.sigma,
+                w[:p - 1] = x[:p - 1] - self.sigma * \
+                    self.st(x[:p - 1] / self.sigma,
                             self.reg_scaled / self.sigma)
-                R = self.sigma * self.y - x[len_y - 1:]
-                w[len_y - 1:] = x[len_y - 1:] - \
+                R = self.sigma * self.y - x[p - 1:]
+                w[p - 1:] = x[p - 1:] - \
                     np.where(abs(R) < self.delta * (self.sigma + 1),
                              self.sigma *
-                             (self.y + x[len_y - 1:]) / (self.sigma + 1),
-                             x[len_y - 1:] + self.delta * np.sign(R))
+                             (self.y + x[p - 1:]) / (self.sigma + 1),
+                             x[p - 1:] + self.delta * np.sign(R))
                 u -= tau * K.T @ w
             u_bar = u + self.theta * (u - u_old)
         self.u = u
