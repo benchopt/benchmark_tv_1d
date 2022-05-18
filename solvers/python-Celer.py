@@ -45,6 +45,7 @@ class Solver(BaseSolver):
             tol=1e-12, prune=True, fit_intercept=False,
             warm_start=False, positive=False, verbose=False,
         )
+        self.run(2)
 
     def run(self, n_iter):
         len_y = self.y.shape[0]
