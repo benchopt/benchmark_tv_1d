@@ -1,9 +1,11 @@
 objective-filter:
   - TV1D[data_fit=quad,delta=0.9,reg=0.5]
   - TV1D[data_fit=huber,delta=0.9,reg=0.5]
-#dataset:
-#  - Simulated Sinusoidal[sigma=0.1,mu=0,K=500,len_output=400,type_A=random_nonsquare]
+dataset:
+  - Simulated Sinusoidal[sigma=0.1,mu=0,K=500,len_output=400,type_A=random_nonsquare]
 #solver:
-#  - all
-n-repetitions: 5
+#  - Celer synthesis
+#  - ADMM analysis and synthesis
+n-repetitions: 1
+timeout: 1200
 max-runs: 100
