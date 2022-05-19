@@ -15,8 +15,8 @@ class Solver(BaseSolver):
     parameters = {'alpha': [1.9],
                   'use_acceleration': [False, True]}
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -42,7 +42,7 @@ class Solver(BaseSolver):
                 z_old[:] = z
                 z[:] = z_acc
             z = self.st(z - stepsize * self.grad(AL, z),
-                        self.reg_scaled * stepsize)
+                        self.reg * stepsize)
             if self.use_acceleration:
                 z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
         self.u = np.cumsum(z)

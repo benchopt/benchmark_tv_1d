@@ -14,13 +14,13 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.9]}
 
-    def skip(self, A, reg_scaled, y, c, delta, data_fit):
+    def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
             return True, "solver does not work with huber loss"
         return False, None
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -40,7 +40,7 @@ class Solver(BaseSolver):
         while callback(np.cumsum(z)):
             mu = z - stepsize * (n * (AL @ z - self.y) * AL.T).T
             nu = np.mean(mu, axis=0)
-            z = self.st(nu, stepsize * self.reg_scaled)
+            z = self.st(nu, stepsize * self.reg)
         self.u = np.cumsum(z)
 
     def get_result(self):

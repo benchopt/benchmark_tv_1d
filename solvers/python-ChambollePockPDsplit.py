@@ -19,8 +19,8 @@ class Solver(BaseSolver):
     parameters = {"ratio": [1.0],
                   "theta": [1.0]}
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -43,7 +43,7 @@ class Solver(BaseSolver):
         while callback(u):
             u_old = u
             v = np.clip(v + sigma_v * np.diff(u_bar),
-                        -self.reg_scaled, self.reg_scaled)
+                        -self.reg, self.reg)
             w_tmp = w + sigma_w * self.A @ u_bar
             if self.data_fit == "huber":
                 # Use Moreau identity + translation rule

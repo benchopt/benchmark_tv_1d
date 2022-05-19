@@ -19,13 +19,13 @@ class Solver(BaseSolver):
     parameters = {'gamma': [1.5, 1.9],
                   'update_pen': [False]}
 
-    def skip(self, A, reg_scaled, y, c, delta, data_fit):
+    def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
             return True, "solver does not work with huber loss"
         return False, None
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -49,7 +49,7 @@ class Solver(BaseSolver):
             z_old = z
             u = np.ravel(A_tmp @ (Aty + np.diff(mu, append=0, prepend=0)
                                   - gamma * np.diff(z, append=0, prepend=0)))
-            z = self.st(np.diff(u) + mu / gamma, self.reg_scaled / gamma)
+            z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
             if self.update_pen:

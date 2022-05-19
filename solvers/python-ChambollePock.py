@@ -19,8 +19,8 @@ class Solver(BaseSolver):
     parameters = {'sigma': [1.],
                   'theta': [1.]}
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -47,14 +47,14 @@ class Solver(BaseSolver):
             if self.data_fit == 'quad':
                 v = v + self.sigma * np.diff(u_bar) - self.sigma * self.st(
                     v / self.sigma + np.diff(u_bar),
-                    self.reg_scaled / self.sigma)
+                    self.reg / self.sigma)
                 u_tmp = u - tau * (-np.diff(v, append=0, prepend=0))
                 u = I_tauAtA_inv @ (tauAty + u_tmp)
             else:
                 x = w + self.sigma * K @ u_bar
                 w[:p - 1] = x[:p - 1] - self.sigma * \
                     self.st(x[:p - 1] / self.sigma,
-                            self.reg_scaled / self.sigma)
+                            self.reg / self.sigma)
                 R = self.sigma * self.y - x[p - 1:]
                 w[p - 1:] = x[p - 1:] - \
                     np.where(abs(R) < self.delta * (self.sigma + 1),

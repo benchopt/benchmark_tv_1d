@@ -33,7 +33,7 @@ class Objective(BaseObjective):
         return np.zeros(self.A.shape[1])
 
     def to_dict(self):
-        return dict(A=self.A, reg_scaled=self.reg_scaled, y=self.y, c=self.c,
+        return dict(A=self.A, reg=self.reg_scaled, y=self.y, c=self.c,
                     delta=self.delta, data_fit=self.data_fit)
 
     def huber(self, R, delta):

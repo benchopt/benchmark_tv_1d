@@ -18,8 +18,8 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'eta': [0.5, 1]}
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -54,7 +54,7 @@ class Solver(BaseSolver):
                 v_tmp = v + sigma * np.diff(2 * u_tmp - u) - \
                     sigma * self.st(v / sigma +
                                     np.diff(2 * u_tmp - u),
-                                    self.reg_scaled / sigma)
+                                    self.reg / sigma)
                 u = eta * u_tmp + (1 - eta)*u
                 v = eta * v_tmp + (1 - eta)*v
             else:
@@ -63,7 +63,7 @@ class Solver(BaseSolver):
                 x_tmp = w + sigma * K @ (2 * u_tmp - u)
                 w_tmp[:p - 1] = x_tmp[:p - 1] - \
                     sigma * self.st(x_tmp[:p - 1] /
-                                    sigma, self.reg_scaled / sigma)
+                                    sigma, self.reg / sigma)
                 R_tmp = sigma * self.y - x_tmp[p - 1:]
                 w_tmp[p - 1:] = x_tmp[p - 1:] - \
                     np.where(abs(R_tmp) < self.delta * (sigma + 1),

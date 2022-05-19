@@ -18,13 +18,13 @@ class Solver(BaseSolver):
     parameters = {'alpha': [1.],
                   'use_acceleration': [False, True]}
 
-    def skip(self, A, reg_scaled, y, c, delta, data_fit):
+    def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
             return True, "solver does not work with huber loss"
         return False, None
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
@@ -53,7 +53,7 @@ class Solver(BaseSolver):
                 v_old[:] = v
                 v[:] = v_acc
             v = np.clip(v - stepsize * (DA_invDA_invt @ v - DA_invy),
-                        -self.reg_scaled, self.reg_scaled)
+                        -self.reg, self.reg)
             if self.use_acceleration:
                 v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
             u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
