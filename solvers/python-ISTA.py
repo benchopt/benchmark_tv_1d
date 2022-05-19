@@ -7,7 +7,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Proximal gradient descent for synthesis formulation."""
-    name = 'ISTA synthesis'
+    name = 'Primal PGD synthesis (ISTA)'
 
     stopping_strategy = 'callback'
 
@@ -15,21 +15,21 @@ class Solver(BaseSolver):
     parameters = {'alpha': [1.9],
                   'use_acceleration': [False, True]}
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        L = np.tri(len_y)
+        p = self.A.shape[1]
+        L = np.tri(p)
         AL = self.A @ L
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)
         # initialisation
-        z = np.zeros(len_y)
+        z = np.zeros(p)
         z[0] = self.c
         z_old = z.copy()
         z_acc = z.copy()
@@ -42,7 +42,7 @@ class Solver(BaseSolver):
                 z_old[:] = z
                 z[:] = z_acc
             z = self.st(z - stepsize * self.grad(AL, z),
-                        self.reg_scaled * stepsize)
+                        self.reg * stepsize)
             if self.use_acceleration:
                 z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
         self.u = np.cumsum(z)

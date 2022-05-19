@@ -14,33 +14,33 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.9]}
 
-    def skip(self, A, reg_scaled, y, c, delta, data_fit):
+    def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
             return True, "solver does not work with huber loss"
         return False, None
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
-        L = np.tri(len_y)
+        n, p = self.A.shape
+        L = np.tri(p)
         AL = self.A @ L
         # alpha / rho
-        stepsize = self.alpha / (len_y * np.max((AL**2).sum(axis=1)))
+        stepsize = self.alpha / (n * np.max((AL**2).sum(axis=1)))
         # initialisation
-        z = np.zeros(len_y)
+        z = np.zeros(p)
         z[0] = self.c
-        mu = np.zeros((len_y, len_y))
-        nu = np.zeros(len_y)
+        mu = np.zeros((p, p))
+        nu = np.zeros(p)
         while callback(np.cumsum(z)):
-            mu = z - stepsize * (len_y * (AL @ z - self.y) * AL.T).T
+            mu = z - stepsize * (n * (AL @ z - self.y) * AL.T).T
             nu = np.mean(mu, axis=0)
-            z = self.st(nu, stepsize * self.reg_scaled)
+            z = self.st(nu, stepsize * self.reg)
         self.u = np.cumsum(z)
 
     def get_result(self):

@@ -30,21 +30,21 @@ class Solver(BaseSolver):
         'vol. 80, pp. 3321-3330 (2018)'
     ]
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
         warnings.filterwarnings('ignore', category=ConvergenceWarning)
-        weights = np.ones(self.y.shape[0])
+        weights = np.ones(self.A.shape[1])
         weights[0] = 0
 
         if data_fit == 'quad':
             self.clf = GeneralizedLinearEstimator(
                 Quadratic(),
-                WeightedL1(self.reg_scaled / self.y.shape[0], weights),
+                WeightedL1(self.reg / self.A.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-12, fit_intercept=False,
@@ -53,16 +53,17 @@ class Solver(BaseSolver):
         else:
             self.clf = GeneralizedLinearEstimator(
                 Huber(self.delta),
-                WeightedL1(self.reg_scaled / self.y.shape[0], weights),
+                WeightedL1(self.reg / self.A.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-12, fit_intercept=False,
                 warm_start=False, verbose=False,
             )
+        self.run(2)
 
     def run(self, n_iter):
-        len_y = self.y.shape[0]
-        L = np.tri(len_y)
+        p = self.A.shape[1]
+        L = np.tri(p)
         AL = self.A @ L
         self.clf.max_iter = n_iter
         self.clf.fit(AL, self.y)

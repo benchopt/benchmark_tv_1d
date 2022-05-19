@@ -33,7 +33,7 @@ class Objective(BaseObjective):
         return np.zeros(self.A.shape[1])
 
     def to_dict(self):
-        return dict(A=self.A, reg_scaled=self.reg_scaled, y=self.y, c=self.c,
+        return dict(A=self.A, reg=self.reg_scaled, y=self.y, c=self.c,
                     delta=self.delta, data_fit=self.data_fit)
 
     def huber(self, R, delta):
@@ -60,9 +60,9 @@ class Objective(BaseObjective):
         return optimize.golden(f, brack=(min(yS), max(yS)))
 
     def get_reg_max(self, c):
-        L = np.tri(self.y.shape[0])
+        L = np.tri(self.A.shape[1])
         AL = self.A @ L
-        z = np.zeros(self.y.shape[0])
+        z = np.zeros(self.A.shape[1])
         z[0] = c
         return np.max(abs(self.grad(AL, z)))
 

@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Proximal gradient descent for analysis formulation."""
-    name = 'PGD synthesis'
+    name = 'Primal PGD analysis'
 
     install_cmd = 'conda'
     requirements = ['pip:prox-tv']
@@ -19,19 +19,19 @@ class Solver(BaseSolver):
     parameters = {'alpha': [1.],
                   'use_acceleration': [False, True]}
 
-    def set_objective(self, A, reg_scaled, y, c, delta, data_fit):
-        self.reg_scaled = reg_scaled
+    def set_objective(self, A, reg, y, c, delta, data_fit):
+        self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
     def run(self, callback):
-        len_y = len(self.y)
+        p = self.A.shape[1]
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(self.A, ord=2)**2)
         # initialisation
-        u = self.c * np.ones(len_y)
+        u = self.c * np.ones(p)
         u_acc = u.copy()
         u_old = u.copy()
 
@@ -44,7 +44,7 @@ class Solver(BaseSolver):
                 u[:] = u_acc
             u = ptv.tv1_1d(
                 u - stepsize * self.grad(self.A, u),
-                self.reg_scaled * stepsize, method='condat')
+                self.reg * stepsize, method='condat')
             if self.use_acceleration:
                 u_acc[:] = u + (t_old - 1.) / t_new * (u - u_old)
         self.u = u
