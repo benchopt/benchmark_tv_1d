@@ -13,7 +13,7 @@ class Dataset(BaseDataset):
 
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
-    # blocked signal + bruit ~ N(mu, sigma)
+    # blocked signal + noise ~ N(mu, sigma)
     parameters = {
         'sigma': [0.1],
         'mu': [0],
