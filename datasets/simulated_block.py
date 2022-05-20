@@ -34,21 +34,21 @@ class Dataset(BaseDataset):
 
     def set_A(self, rng):
         if self.type_A == 'random_square':
-            A = rng.randn(self.n_features, self.n_features)
+            A = rng.randn(self.n_samples, self.n_samples)
         elif self.type_A == 'random_nonsquare':
             A = rng.randn(self.n_features, self.n_samples)
         else:
-            A = np.identity(self.n_features)
+            A = np.identity(self.n_samples)
         return A
 
     def get_data(self):
         rng = np.random.RandomState(47)
         rvs = stats.norm(loc=0, scale=1).rvs
-        w = np.cumsum(sprandom(1, self.n_features,
-                      density=self.num_block/self.n_features,
+        w = np.cumsum(sprandom(1, self.n_samples,
+                      density=self.num_block/self.n_samples,
                       random_state=rng, data_rvs=rvs).A[0])
         A = self.set_A(rng)
-        y = A @ w + rng.normal(self.mu, self.sigma, self.n_features)
+        y = A @ w + rng.normal(self.mu, self.sigma, A.shape[0])
         data = dict(A=A, y=y)
 
         return data
