@@ -15,33 +15,33 @@ class Dataset(BaseDataset):
     parameters = {
         'sigma': [0.1],
         'mu': [0],
-        'K': [500],
-        'len_output': [400],
+        'n_features': [500],
+        'n_samples': [400],
         'type_A': ['identity', 'random_square', 'random_nonsquare']}
 
-    def __init__(self, mu=0, sigma=0.3, K=10, len_output=5,
+    def __init__(self, mu=0, sigma=0.3, n_features=10, n_samples=5,
                  type_A='identity', random_state=27):
         # Store the parameters of the dataset
         self.mu = mu
         self.sigma = sigma
-        self.K, self.len_output = K, len_output
+        self.n_features, self.n_samples = n_features, n_samples
         self.type_A = type_A
         self.random_state = random_state
 
     def set_A(self, rng):
         if self.type_A == 'random_square':
-            A = rng.randn(self.K, self.K)
+            A = rng.randn(self.n_features, self.n_features)
         elif self.type_A == 'random_nonsquare':
-            A = rng.randn(self.K, self.len_output)
+            A = rng.randn(self.n_features, self.n_samples)
         else:
-            A = np.identity(self.K)
+            A = np.identity(self.n_features)
         return A
 
     def get_data(self):
-        t = np.arange(self.K)
+        t = np.arange(self.n_features)
         rng = np.random.RandomState(47)
-        w = np.cos(np.pi*t/self.K*10)
-        y = self.A @ w + rng.normal(self.mu, self.sigma, self.K)
+        w = np.cos(np.pi*t/self.n_features*10)
+        y = self.A @ w + rng.normal(self.mu, self.sigma, self.n_features)
         data = dict(A=self.set_A(rng), y=y)
 
         return data
