@@ -40,7 +40,8 @@ class Dataset(BaseDataset):
     def get_data(self):
         t = np.arange(self.K)
         rng = np.random.RandomState(47)
-        y = np.cos(np.pi*t/self.K*10) + rng.normal(self.mu, self.sigma, self.K)
+        w = np.cos(np.pi*t/self.K*10)
+        y = self.A @ w + rng.normal(self.mu, self.sigma, self.K)
         data = dict(A=self.set_A(rng), y=y)
 
         return data

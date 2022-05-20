@@ -44,10 +44,10 @@ class Dataset(BaseDataset):
     def get_data(self):
         rng = np.random.RandomState(47)
         rvs = stats.norm(loc=0, scale=1).rvs
-        y = np.cumsum(sprandom(1, self.n_features,
+        w = np.cumsum(sprandom(1, self.n_features,
                       density=self.num_block/self.n_features,
-                      random_state=rng, data_rvs=rvs).A[0]) + \
-            rng.normal(self.mu, self.sigma, self.n_features)
+                      random_state=rng, data_rvs=rvs).A[0])
+        y = self.A @ w + rng.normal(self.mu, self.sigma, self.n_features)
         data = dict(A=self.set_A(rng), y=y)
 
         return data
