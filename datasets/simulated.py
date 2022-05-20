@@ -41,7 +41,8 @@ class Dataset(BaseDataset):
         t = np.arange(self.n_features)
         rng = np.random.RandomState(47)
         w = np.cos(np.pi*t/self.n_features*10)
-        y = self.A @ w + rng.normal(self.mu, self.sigma, self.n_features)
+        A = self.set_A(rng)
+        y = A @ w + rng.normal(self.mu, self.sigma, self.n_features)
         data = dict(A=self.set_A(rng), y=y)
 
         return data

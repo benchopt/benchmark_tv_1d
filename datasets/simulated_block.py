@@ -47,7 +47,8 @@ class Dataset(BaseDataset):
         w = np.cumsum(sprandom(1, self.n_features,
                       density=self.num_block/self.n_features,
                       random_state=rng, data_rvs=rvs).A[0])
-        y = self.A @ w + rng.normal(self.mu, self.sigma, self.n_features)
-        data = dict(A=self.set_A(rng), y=y)
+        A = self.set_A(rng)
+        y = A @ w + rng.normal(self.mu, self.sigma, self.n_features)
+        data = dict(A=A, y=y)
 
         return data
