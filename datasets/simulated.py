@@ -43,6 +43,6 @@ class Dataset(BaseDataset):
         w = np.cos(np.pi*t/self.n_features*10)
         A = self.set_A(rng)
         y = A @ w + rng.normal(self.mu, self.sigma, self.n_features)
-        data = dict(A=self.set_A(rng), y=y)
+        data = dict(A=A, y=y)
 
         return data
