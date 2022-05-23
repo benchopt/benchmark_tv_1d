@@ -16,7 +16,7 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'eta': [0.5, 1.]}
+    parameters = {'eta': [1.]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg

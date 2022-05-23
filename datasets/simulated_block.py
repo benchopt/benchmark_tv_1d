@@ -17,8 +17,8 @@ class Dataset(BaseDataset):
     parameters = {
         'sigma': [0.1],
         'mu': [0],
-        'n_features': [50],
-        'n_samples': [40],
+        'n_features': [500],
+        'n_samples': [400],
         'type_A': ['identity', 'random_square', 'random_nonsquare'],
         'num_block': [3]}
 
