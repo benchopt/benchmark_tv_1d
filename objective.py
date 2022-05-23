@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 class Objective(BaseObjective):
     name = "TV1D"
 
-    parameters = {'reg': [0.5],
+    parameters = {'reg': [0.1],
                   'delta': [0.9],
                   'data_fit': ['quad', 'huber']
                   }
@@ -17,12 +17,13 @@ class Objective(BaseObjective):
     def set_data(self, A, y):
         self.A = A
         self.y = y
-        S = np.sum(self.A, axis=1)
+        self.n_samples = y.shape[0] - A.shape[0] + 1
+        S = np.convolve(np.ones(self.n_samples), A)
         self.c = self.get_c(S, self.delta)
         self.reg_scaled = self.reg*self.get_reg_max(self.c)
 
     def compute(self, u):
-        R = self.y - self.A @ u
+        R = self.y - np.convolve(u, self.A)
         if self.data_fit == 'quad':
             return .5 * R @ R + self.reg_scaled*(abs(np.diff(u)).sum())
         else:
@@ -30,7 +31,7 @@ class Objective(BaseObjective):
                 + self.reg_scaled*(abs(np.diff(u)).sum())
 
     def get_one_solution(self):
-        return np.zeros(self.A.shape[1])
+        return np.zeros(self.n_samples)
 
     def to_dict(self):
         return dict(A=self.A, reg=self.reg_scaled, y=self.y, c=self.c,
@@ -45,33 +46,30 @@ class Objective(BaseObjective):
 
     def get_c(self, S, delta):
         if self.data_fit == 'quad':
-            return self.c_quad(S)
+            return (S @ self.y)/(S @ S)
         else:
             return self.c_huber(S, delta)
-
-    def c_quad(self, S):
-        return (S @ self.y)/(S @ S)
 
     def c_huber(self, S, delta):
         def f(c):
             R = self.y - S * c
-            return abs(self.grad_huber(R, delta).sum())
+            return abs(S @ self.grad_huber(R, delta))
         yS = self.y / S
         return optimize.golden(f, brack=(min(yS), max(yS)))
 
     def get_reg_max(self, c):
-        L = np.tri(self.A.shape[1])
-        AL = self.A @ L
-        z = np.zeros(self.A.shape[1])
+        L = np.tri(self.n_samples)
+        z = np.zeros(self.n_samples)
         z[0] = c
-        return np.max(abs(self.grad(AL, z)))
+        return np.max(abs(self.grad_z(self.A, L, z)))
 
-    def grad(self, A, u):
-        R = self.y - A @ u
+    def grad_z(self, A, L, z):
+        R = self.y - np.convolve(L @ z, A)
         if self.data_fit == 'quad':
-            return - A.T @ R
+            return - L.T @ np.correlate(R, A, mode="valid")
         else:
-            return - A.T @ self.grad_huber(R, self.delta)
+            return - L.T @ np.correlate(self.grad_huber(R, self.delta),
+                                        A, mode="valid")
 
     def grad_huber(self, R, delta):
         return np.where(np.abs(R) < delta, R, np.sign(R) * delta)

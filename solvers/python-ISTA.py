@@ -18,18 +18,17 @@ class Solver(BaseSolver):
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.n_samples = y.shape[0] - A.shape[0] + 1
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
     def run(self, callback):
-        p = self.A.shape[1]
-        L = np.tri(p)
-        AL = self.A @ L
+        L = np.tri(self.n_samples)
         # alpha / rho
-        stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)
+        stepsize = self.alpha / (np.linalg.norm(self.A, ord=2))**2
         # initialisation
-        z = np.zeros(p)
+        z = np.zeros(self.n_samples)
         z[0] = self.c
         z_old = z.copy()
         z_acc = z.copy()
@@ -41,7 +40,7 @@ class Solver(BaseSolver):
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
                 z_old[:] = z
                 z[:] = z_acc
-            z = self.st(z - stepsize * self.grad(AL, z),
+            z = self.st(z - stepsize * self.grad_z(self.A, L, z),
                         self.reg * stepsize)
             if self.use_acceleration:
                 z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
@@ -56,12 +55,13 @@ class Solver(BaseSolver):
         w[0] = w0
         return w
 
-    def grad(self, A, u):
-        R = self.y - A @ u
+    def grad_z(self, A, L, z):
+        R = self.y - np.convolve(L @ z, A)
         if self.data_fit == 'quad':
-            return - A.T @ R
+            return - L.T @ np.correlate(R, A, mode="valid")
         else:
-            return - A.T @ self.grad_huber(R, self.delta)
+            return - L.T @ np.correlate(self.grad_huber(R, self.delta),
+                                        A, mode="valid")
 
     def grad_huber(self, R, delta):
         return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
