@@ -4,7 +4,6 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import random as sprandom
-    from scipy.stats import rv_continuous
 
 
 class Dataset(BaseDataset):
@@ -20,7 +19,7 @@ class Dataset(BaseDataset):
         'n_features': [500],
         'n_samples': [400],
         'type_A': ['identity', 'random_square', 'random_nonsquare'],
-        'num_block': [3]}
+        'num_block': [6]}
 
     def __init__(self, mu=0, sigma=0.3, n_features=10, n_samples=5,
                  type_A='identity', random_state=27, num_block=1):
@@ -42,16 +41,10 @@ class Dataset(BaseDataset):
         return A
 
     def get_data(self):
-        rng = np.random.RandomState(47)
-
-        class CustomDistribution(rv_continuous):
-            def _rvs(self,  size=None, random_state=None):
-                return random_state.standard_normal(size)
-        data_rvs = CustomDistribution(seed=rng)().rvs
-
-        w = np.cumsum(sprandom(1, self.n_samples,
+        rng = np.random.RandomState(self.random_state)
+        w = np.cumsum(rng.randn(self.n_samples) * sprandom(1, self.n_samples,
                       density=self.num_block/self.n_samples,
-                      random_state=rng, data_rvs=data_rvs).A[0])
+                      random_state=rng, data_rvs=np.ones).A[0])
         A = self.set_A(rng)
         y = A @ w + rng.normal(self.mu, self.sigma, A.shape[0])
         data = dict(A=A, y=y)

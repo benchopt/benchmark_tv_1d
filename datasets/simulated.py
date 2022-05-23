@@ -39,7 +39,7 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         t = np.arange(self.n_samples)
-        rng = np.random.RandomState(47)
+        rng = np.random.RandomState(self.random_state)
         w = np.cos(np.pi*t/self.n_samples*10)
         A = self.set_A(rng)
         y = A @ w + rng.normal(self.mu, self.sigma, A.shape[0])
