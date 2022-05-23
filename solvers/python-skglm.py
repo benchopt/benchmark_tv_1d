@@ -25,9 +25,9 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
     requirements = ["pip:git+https://github.com/EnLAI111/skglm@Huber_datafit"]
     references = [
-        'M. Massias, A. Gramfort and J. Salmon, ICML, '
-        '"Celer: a Fast Solver for the Lasso with Dual Extrapolation", '
-        'vol. 80, pp. 3321-3330 (2018)'
+        'M. Massias, P. Bannier, Q. Klopfenstein and Q. Bertrand.'
+        '"skglm: Fast and modular Generalized Linear Models'
+        'with support for models missing in scikit-learn."'
     ]
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
