@@ -8,6 +8,7 @@ solver:
   - Primal PGD analysis
   - Chambolle-Pock PD-split analysis
   - CondatVu analysis
+  - Primal PGD synthesis (ISTA)
 n-repetitions: 1
 timeout: 20
 max-runs: 50

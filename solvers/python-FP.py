@@ -33,13 +33,17 @@ class Solver(BaseSolver):
     def run(self, callback):
         n = self.y.shape[0]
         L = np.tri(self.n_samples)
-        AL = self.A @ L
-        # alpha / rho
-        stepsize = self.alpha / (n * np.max((AL**2).sum(axis=1)))
+
         # initialisation
         z = np.zeros(self.n_samples)
+        z[0] = 1
+
+        # alpha / rho
+        stepsize = self.alpha / \
+            (n * 10 * np.max(np.convolve(L @ z, self.A)**2))
+
         z[0] = self.c
-        mu = np.zeros((self.n_samples, self.n_samplesp))
+        mu = np.zeros((self.n_samples, self.n_samples))
         nu = np.zeros(self.n_samples)
         while callback(np.cumsum(z)):
             mu = z - stepsize * (n * self.grad_z(self.A, L, z)).T
