@@ -53,7 +53,7 @@ class Objective(BaseObjective):
     def c_huber(self, S, delta):
         def f(c):
             R = self.y - S * c
-            return abs(S @ self.grad_huber(R, delta))
+            return abs((S * self.grad_huber(R, delta)).sum())
         yS = self.y / S
         return optimize.golden(f, brack=(min(yS), max(yS)))
 
