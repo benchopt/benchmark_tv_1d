@@ -30,7 +30,8 @@ class Solver(BaseSolver):
     def run(self, callback):
         # Block preconditioning (2x2)
         LD = 2.0  # Lipschitz constant associated to D (only for 1d!!)
-        LA = 10 * np.linalg.norm(self.A, ord=2)
+        LA = np.linalg.norm(np.convolve(
+                np.ones(self.n_samples), self.A), ord=2)
         tau = self.ratio / (LA + LD)
         sigma_v = 1.0 / (self.ratio * LD)
         sigma_w = 1.0 / (self.ratio * LA)

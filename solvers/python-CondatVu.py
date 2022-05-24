@@ -42,9 +42,9 @@ class Solver(BaseSolver):
 
         sigma = 0.5
         eta = self.eta
-
-        tau = 1 / (10 * np.linalg.norm(self.A**2, ord=2) /
-                   2 + sigma * np.linalg.norm(D, ord=2) ** 2)
+        LA = np.linalg.norm(np.convolve(
+                np.ones(self.n_samples), self.A) ** 2, ord=2)
+        tau = 1 / (LA / 2 + sigma * np.linalg.norm(D, ord=2) ** 2)
 
         while callback(u):
             u_tmp = u - tau * np.correlate(np.convolve(u, self.A) - self.y,
