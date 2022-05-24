@@ -54,13 +54,3 @@ class Solver(BaseSolver):
         w -= np.clip(w, -mu, mu)
         w[0] = w0
         return w
-
-    def grad(self, A, u):
-        R = self.y - A @ u
-        if self.data_fit == 'quad':
-            return - A.T @ R
-        else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
