@@ -33,6 +33,7 @@ class Solver(BaseSolver):
     def run(self, callback):
         n = self.y.shape[0]
         L = np.tri(self.n_samples)
+        AL = self.A @ L
 
         # initialisation
         z = np.zeros(self.n_samples)
@@ -46,7 +47,7 @@ class Solver(BaseSolver):
         mu = np.zeros((self.n_samples, self.n_samples))
         nu = np.zeros(self.n_samples)
         while callback(np.cumsum(z)):
-            mu = z - stepsize * (n * self.grad_z(self.A, L, z)).T
+            mu = z - stepsize * (n * (AL @ z - self.y) * AL.T).T
             nu = np.mean(mu, axis=0)
             z = self.st(nu, stepsize * self.reg)
         self.u = np.cumsum(z)
@@ -59,14 +60,3 @@ class Solver(BaseSolver):
         w -= np.clip(w, -mu, mu)
         w[0] = w0
         return w
-
-    def grad_z(self, A, L, z):
-        R = self.y - np.convolve(L @ z, A)
-        if self.data_fit == 'quad':
-            return - L.T @ np.correlate(R, A, mode="valid")
-        else:
-            return - L.T @ np.correlate(self.grad_huber(R, self.delta),
-                                        A, mode="valid")
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
