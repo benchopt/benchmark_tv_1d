@@ -34,13 +34,14 @@ class Solver(BaseSolver):
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.n_samples = y.shape[0] - A.shape[0] + 1
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
         warnings.filterwarnings('ignore', category=ConvergenceWarning)
         self.lasso = Lasso(
-            alpha=self.reg / self.A.shape[0], max_iter=1,
+            alpha=self.reg / self.y.shape[0], max_iter=1,
             max_epochs=100000,
             tol=1e-12, prune=True, fit_intercept=False,
             warm_start=False, positive=False, verbose=False,
@@ -48,11 +49,10 @@ class Solver(BaseSolver):
         self.run(2)
 
     def run(self, n_iter):
-        n, p = self.A.shape
-        L = np.tri(p)[:, 1:]
-        S = np.sum(self.A, axis=1)
-        AL = self.A @ L
-        A_op = self.A @ np.ones((p, p)) @ (self.A.T) / (S @ S)
+        L = np.tri(self.n_samples)[:, 1:]
+        S = np.convolve(np.ones(self.n_samples), self.A)
+        AL = np.array([np.convolve(l_col, self.A) for l_col in L.T]).T
+        A_op = np.array(np.matrix(S).T @ np.matrix(S)) / (S @ S)
         y_new = self.y - A_op @ self.y
         AL_new = AL - A_op @ AL
         self.lasso.max_iter = n_iter

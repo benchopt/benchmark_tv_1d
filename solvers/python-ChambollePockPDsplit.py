@@ -12,7 +12,7 @@ class Solver(BaseSolver):
     name = "Chambolle-Pock PD-split analysis"
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=50,
+        patience=20,
         strategy="callback")
 
     # any parameter defined here is accessible as a class attribute

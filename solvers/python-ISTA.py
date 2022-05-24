@@ -25,14 +25,11 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         L = np.tri(self.n_samples)
-
+        AL = np.array([np.convolve(l_col, self.A) for l_col in L.T]).T
+        # alpha / rho
+        stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)
         # initialisation
         z = np.zeros(self.n_samples)
-        z[0] = 1
-        # alpha / rho
-        stepsize = self.alpha / \
-            (10 * np.linalg.norm(np.convolve(L @ z, self.A), ord=2))**2
-
         z[0] = self.c
         z_old = z.copy()
         z_acc = z.copy()

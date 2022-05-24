@@ -4,7 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    from scipy.sparse import spdiags
+    from scipy.sparse.linalg import LinearOperator
+    from scipy.sparse.linalg import cg
 
 
 class Solver(BaseSolver):
@@ -27,28 +28,27 @@ class Solver(BaseSolver):
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.n_samples = y.shape[0] - A.shape[0] + 1
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
     def run(self, callback):
-        p = self.A.shape[1]
-        data = np.array([-np.ones(p), np.ones(p)])
-        diags = np.array([0, 1])
-        D = spdiags(data, diags, p-1, p)
-        u = self.c * np.ones(p)
-        z = np.zeros(p - 1)
-        mu = np.zeros(p - 1)
+        u = self.c * np.ones(self.n_samples)
+        z = np.zeros(self.n_samples - 1)
+        mu = np.zeros(self.n_samples - 1)
         gamma = self.gamma
-        AtA = self.A.T @ self.A
-        DtD = D.T @ D
-        Aty = self.A.T @ self.y
-        A_tmp = np.linalg.pinv(AtA + gamma * DtD)
+        Aty = np.correlate(self.y, self.A, mode="valid")
+        AtA_gDtD = LinearOperator(shape=(self.n_samples, self.n_samples),
+                                  matvec=lambda x: np.correlate(
+            np.convolve(self.A, x), self.A, mode="valid") -
+            gamma * np.diff(np.diff(x), append=0, prepend=0))
 
         while callback(u):
             z_old = z
-            u = np.ravel(A_tmp @ (Aty + np.diff(mu, append=0, prepend=0)
-                                  - gamma * np.diff(z, append=0, prepend=0)))
+            u_tmp = Aty + np.diff(mu, append=0, prepend=0) - \
+                gamma * np.diff(z, append=0, prepend=0)
+            u, _ = cg(AtA_gDtD, u_tmp)
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 

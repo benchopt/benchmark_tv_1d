@@ -33,18 +33,19 @@ class Solver(BaseSolver):
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
+        self.n_samples = y.shape[0] - A.shape[0] + 1
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
 
         warnings.filterwarnings('ignore', category=ConvergenceWarning)
-        weights = np.ones(self.A.shape[1])
+        weights = np.ones(self.n_samples)
         weights[0] = 0
 
         if data_fit == 'quad':
             self.clf = GeneralizedLinearEstimator(
                 Quadratic(),
-                WeightedL1(self.reg / self.A.shape[0], weights),
+                WeightedL1(self.reg / self.y.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-12, fit_intercept=False,
@@ -53,7 +54,7 @@ class Solver(BaseSolver):
         else:
             self.clf = GeneralizedLinearEstimator(
                 Huber(self.delta),
-                WeightedL1(self.reg / self.A.shape[0], weights),
+                WeightedL1(self.reg / self.y.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-12, fit_intercept=False,
@@ -62,9 +63,8 @@ class Solver(BaseSolver):
         self.run(2)
 
     def run(self, n_iter):
-        p = self.A.shape[1]
-        L = np.tri(p)
-        AL = self.A @ L
+        L = np.tri(self.n_samples)
+        AL = np.array([np.convolve(l_col, self.A) for l_col in L.T]).T
         self.clf.max_iter = n_iter
         self.clf.fit(AL, self.y)
         z = self.clf.coef_.flatten()

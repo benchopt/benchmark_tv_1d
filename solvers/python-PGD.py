@@ -29,7 +29,9 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         # alpha / rho
-        stepsize = self.alpha / (10 * np.linalg.norm(self.A, ord=2)**2)
+        stepsize = self.alpha / \
+            np.linalg.norm(np.convolve(
+                np.ones(self.n_samples), self.A), ord=2)**2
         # initialisation
         u = self.c * np.ones(self.n_samples)
         u_acc = u.copy()

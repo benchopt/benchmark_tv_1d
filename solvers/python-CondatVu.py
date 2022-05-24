@@ -12,7 +12,7 @@ class Solver(BaseSolver):
     name = 'CondatVu analysis'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=50, strategy='callback'
+        patience=20, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute
