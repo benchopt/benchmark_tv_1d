@@ -2,10 +2,10 @@ objective:
   - TV1D[data_fit=quad,delta=0.9,reg=0.5]
   - TV1D[data_fit=huber,delta=0.9,reg=0.5]
 dataset:
-  - Simulated sinusoidal[sigma=0.1,mu=0,n_features=50,n_samples=40,type_A=random]
-  - Simulated blocked[sigma=0.1,mu=0,n_features=50,n_samples=40,type_A=random,num_block=3]
+  - Simulated sinusoidal[sigma=0.1,mu=0,n_features=500,n_samples=400,type_A=random]
+  - Simulated blocked[sigma=0.1,mu=0,n_features=500,n_samples=400,type_A=random,num_block=10]
 #solver:
 #  - all
 n-repetitions: 1
-timeout: 100
-max-runs: 50
+timeout: 1200
+max-runs: 100

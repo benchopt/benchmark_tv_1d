@@ -15,8 +15,8 @@ class Dataset(BaseDataset):
     parameters = {
         'sigma': [0.1],
         'mu': [0],
-        'n_features': [50],
-        'n_samples': [40],
+        'n_features': [500],
+        'n_samples': [400],
         'type_A': ['identity', 'random']}
 
     def __init__(self, mu=0, sigma=0.3, n_features=10, n_samples=5,
