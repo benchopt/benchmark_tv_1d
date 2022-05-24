@@ -33,7 +33,7 @@ class Solver(BaseSolver):
         sigma = 0.5
         tau = 1. / np.linalg.norm(self.A, ord=2)**2
         I_tauAtA_inv = np.linalg.pinv(
-            np.eye(n, p, k=0) + tau * self.A.T @ self.A)
+            np.identity(p) + tau * self.A.T @ self.A)
         K = np.r_[D.toarray(), self.A]
 
         u = self.c * np.ones(p)
