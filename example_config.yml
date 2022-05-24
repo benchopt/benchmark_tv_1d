@@ -4,11 +4,8 @@ objective:
 dataset:
   - Simulated sinusoidal[sigma=0.1,mu=0,n_features=50,n_samples=40,type_A=random]
   - Simulated blocked[sigma=0.1,mu=0,n_features=50,n_samples=40,type_A=random,num_block=3]
-solver:
-  - Primal PGD analysis
-  - Chambolle-Pock PD-split analysis
-  - CondatVu analysis
-  - Primal PGD synthesis (ISTA)
+#solver:
+#  - all
 n-repetitions: 1
-timeout: 20
+timeout: 100
 max-runs: 50
