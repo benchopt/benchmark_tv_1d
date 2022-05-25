@@ -52,7 +52,7 @@ class Dataset(BaseDataset):
             z = sprand(
                 1, self.n_features, density=self.n_block/self.n_features,
                 random_state=rng
-            ).to_array()[0]
+            ).toarray()[0]
             x = np.cumsum(rng.randn(self.n_features) * z)
         A = self.get_A(rng)
         y = A @ x + rng.normal(self.mu, self.sigma, self.n_samples)
