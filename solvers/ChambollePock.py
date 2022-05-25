@@ -16,7 +16,8 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'theta': [1.]}
+    parameters = {'sigma': [0.5],
+                  'theta': [1.]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -30,7 +31,7 @@ class Solver(BaseSolver):
         data = np.array([-np.ones(p), np.ones(p)])
         diags = np.array([0, 1])
         D = spdiags(data, diags, p-1, p)
-        sigma = 0.5
+        sigma = self.sigma
         tau = 1. / np.linalg.norm(self.A, ord=2)**2
         I_tauAtA_inv = np.linalg.pinv(
             np.identity(p) + tau * self.A.T @ self.A)
