@@ -19,7 +19,7 @@ class Dataset(BaseDataset):
         'n_features': [500],
         'n_samples': [400],
         'type_A': ['identity', 'random_square', 'random_nonsquare'],
-        'num_block': [6]}
+        'num_block': [10]}
 
     def __init__(self, mu=0, sigma=0.3, n_features=10, n_samples=5,
                  type_A='identity', random_state=27, num_block=1):
