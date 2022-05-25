@@ -12,7 +12,9 @@ class Solver(BaseSolver):
     name = 'Primal PGD analysis'
 
     install_cmd = 'conda'
-    requirements = ['pip:prox-tv']
+
+    # We need blas devel to get the include file for BLAS/LAPACK operations
+    requirements = ["blas-devel", 'pip:prox-tv']
 
     stopping_criterion = SufficientProgressCriterion(
         patience=5, strategy='callback'

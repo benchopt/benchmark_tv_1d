@@ -55,9 +55,13 @@ class Solver(BaseSolver):
         A_op = self.A @ np.ones((p, p)) @ (self.A.T) / (S @ S)
         y_new = self.y - A_op @ self.y
         AL_new = AL - A_op @ AL
-        self.lasso.max_iter = n_iter
-        self.lasso.fit(AL_new, y_new)
-        z = self.lasso.coef_.flatten()
+
+        if n_iter > 0:
+            self.lasso.max_iter = n_iter
+            self.lasso.fit(AL_new, y_new)
+            z = self.lasso.coef_.flatten()
+        else:
+            z = np.zeros(L.shape[1])
         c = S @ (self.y - AL @ z) / (S @ S)
         self.u = np.r_[0, np.cumsum(z)] + c
 
