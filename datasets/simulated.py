@@ -15,16 +15,16 @@ class Dataset(BaseDataset):
     parameters = {
         'sigma': [0.1],
         'mu': [0],
-        'n_features': [500],
-        'n_samples': [400],
+        'n_samples': [500],
+        'n_features': [400],
         'type_A': ['identity', 'random_square', 'random_nonsquare']}
 
-    def __init__(self, mu=0, sigma=0.3, n_features=10, n_samples=5,
+    def __init__(self, mu=0, sigma=0.3, n_samples=10, n_features=5,
                  type_A='identity', random_state=27):
         # Store the parameters of the dataset
         self.mu = mu
         self.sigma = sigma
-        self.n_features, self.n_samples = n_features, n_samples
+        self.n_samples, self.n_features = n_samples, n_features
         self.type_A = type_A
         self.random_state = random_state
 
@@ -32,16 +32,16 @@ class Dataset(BaseDataset):
         if self.type_A == 'random_square':
             A = rng.randn(self.n_samples, self.n_samples)
         elif self.type_A == 'random_nonsquare':
-            A = rng.randn(self.n_features, self.n_samples)
+            A = rng.randn(self.n_samples, self.n_features)
         else:
             A = np.identity(self.n_samples)
         return A
 
     def get_data(self):
-        t = np.arange(self.n_samples)
         rng = np.random.RandomState(self.random_state)
-        w = np.cos(np.pi*t/self.n_samples*10)
         A = self.set_A(rng)
+        t = np.arange(A.shape[1])
+        w = np.cos(np.pi*t/A.shape[1]*10)
         y = A @ w + rng.normal(self.mu, self.sigma, A.shape[0])
         data = dict(A=A, y=y)
 

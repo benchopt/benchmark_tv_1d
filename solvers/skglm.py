@@ -47,7 +47,7 @@ class Solver(BaseSolver):
                 WeightedL1(self.reg / self.A.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
-                tol=1e-12, fit_intercept=False,
+                tol=0, fit_intercept=False,
                 warm_start=False, verbose=False,
             )
         else:
@@ -56,7 +56,7 @@ class Solver(BaseSolver):
                 WeightedL1(self.reg / self.A.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
-                tol=1e-12, fit_intercept=False,
+                tol=0, fit_intercept=False,
                 warm_start=False, verbose=False,
             )
         self.run(2)

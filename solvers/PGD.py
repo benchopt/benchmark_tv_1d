@@ -1,4 +1,5 @@
 from benchopt import BaseSolver
+from benchopt.stopping_criterion import SufficientProgressCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -13,7 +14,9 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
     requirements = ['pip:prox-tv']
 
-    stopping_strategy = "callback"
+    stopping_criterion = SufficientProgressCriterion(
+        patience=5, strategy='callback'
+    )
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.],
