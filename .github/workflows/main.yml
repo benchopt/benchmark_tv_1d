@@ -27,6 +27,7 @@ jobs:
       VERSION_PYTHON: ${{ matrix.version_python }}
       BENCHOPT_BRANCH: benchopt:main
       BENCHOPT_DEBUG: 1
+      BENCHOPT_CONDA_CMD: mamba
 
     defaults:
       run:
@@ -36,11 +37,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Install blas/lapack on Linux
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get install -y libblas-dev liblapack-dev
 
     - name: Setup Conda
       uses: conda-incubator/setup-miniconda@v2
@@ -55,7 +51,7 @@ jobs:
     - name: Install benchopt and its dependencies
       run: |
         conda info
-        conda install -yq pip
+        conda install -yq pip mamba
 
         # Get the correct branch of benchopt
         user=${BENCHOPT_BRANCH%:*}
