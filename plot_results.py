@@ -5,9 +5,16 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
-from celer.plot_utils import configure_plt
+import matplotlib as mpl
 
-configure_plt()
+
+usetex = mpl.checkdep_usetex(True)
+params = {
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Computer Modern Roman"],
+    "text.usetex": usetex,
+}
+mpl.rcParams.update(params)
 
 # matplotlib style config
 titlesize = 22
@@ -59,10 +66,10 @@ IDX_ROWS = [
             1, r"$\ell_2$ reg=0.1 -- $\|x - u\|_2$"
         ),
         ("", "data_fit=huber,delta=0.9,reg=0.5", "objective_norm_x"): (
-            2, "Huber[$\mu=0.9$] reg=0.5 -- $\|x - u\|_2$"
+            2, r"Huber[$\mu=0.9$] reg=0.5 -- $\|x - u\|_2$"
         ),
         ("", "data_fit=huber,delta=0.9,reg=0.1", "objective_norm_x"): (
-            3, "Huber reg=0.1 -- $\|x - u\|_2$"
+            3, r"Huber reg=0.1 -- $\|x - u\|_2$"
         )
     }
 ]
@@ -70,13 +77,13 @@ IDX_ROWS = [
 IDX_COLUMNS = [
     {
         ("n_features=500,n_samples=400,num_block=10", "", ""): (
-            0, "p=400, K=10"
+            0, "n=400, K=10"
         ),
         ("n_features=500,n_samples=400,num_block=50", "", ""): (
-            1, "p=400, K=50"
+            1, "n=400, K=50"
         ),
         ("n_features=500,n_samples=750,num_block=10", "", ""): (
-            2, "p=750, K=10"
+            2, "n=750, K=10"
         ),
     }
 ] * 2
@@ -86,7 +93,9 @@ all_solvers = {
     'Primal PGD analysis[alpha=1.0,use_acceleration=False]': "PGD (A)",
     'Primal PGD analysis[alpha=1.0,use_acceleration=True]': "APGD (A)",
     'Chambolle-Pock analysis[sigma=0.5,theta=1.0]': "Chambolle-Pock (A)",
-    'Chambolle-Pock PD-split analysis[ratio=1.0,theta=1.0]': "Chambolle-Pock split (A)",
+    'Chambolle-Pock PD-split analysis[ratio=1.0,theta=1.0]': (
+        "Chambolle-Pock split (A)"
+    ),
     'CondatVu analysis[eta=1.0]': "Condat-Vu (A)",
     'Dual PGD analysis[alpha=1.0,use_acceleration=False]': "Dual PGD (D)",
     'Dual PGD analysis[alpha=1.0,use_acceleration=True]': "Dual APGD (D)",
@@ -174,7 +183,7 @@ for figname, idx_rows, idx_cols in zip(fignames, IDX_ROWS, IDX_COLUMNS):
                         markersize=6,
                     )
 
-                ax.set_xlim([DICT_XLIM.get(dataset, MIN_XLIM), ax.get_xlim()[1]])
+                ax.set_xlim(DICT_XLIM.get(dataset, MIN_XLIM), ax.get_xlim()[1])
 
                 x1, x2 = ax.get_xlim()
                 x1, x2 = np.ceil(np.log10(x1)), np.floor(np.log10(x2))
@@ -187,7 +196,9 @@ for figname, idx_rows, idx_cols in zip(fignames, IDX_ROWS, IDX_COLUMNS):
                 axarr[idx_row, 0].set_yticks(YTICKS)
 
                 axarr[0, idx_col].set_title(clabel, fontsize=labelsize)
-                axarr[n_rows-1, idx_col].set_xlabel("Time (s)", fontsize=labelsize)
+                axarr[n_rows-1, idx_col].set_xlabel(
+                    "Time (s)", fontsize=labelsize
+                )
 
                 ax.tick_params(axis='both', which='major', labelsize=ticksize)
                 ax.grid()
@@ -205,10 +216,12 @@ for figname, idx_rows, idx_cols in zip(fignames, IDX_ROWS, IDX_COLUMNS):
 
     # take first ax, more likely to have all solvers converging
     ax = axarr[0, 0]
-    lines_ordered = list(itertools.chain(*[ax.lines[i::n_col] for i in range(n_col)]))
+    lines_ordered = list(itertools.chain(
+        *[ax.lines[i::n_col] for i in range(n_col)]
+    ))
     legend = ax2.legend(
-        lines_ordered, [line.get_label() for line in lines_ordered], ncol=n_col,
-        loc="upper center")
+        lines_ordered, [line.get_label() for line in lines_ordered],
+        ncol=n_col, loc="upper center")
     leg_fig.canvas.draw()
     leg_fig.tight_layout()
     width = legend.get_window_extent().width
@@ -216,7 +229,6 @@ for figname, idx_rows, idx_cols in zip(fignames, IDX_ROWS, IDX_COLUMNS):
     leg_fig.set_size_inches((width / 80,  max(height / 80, 0.5)))
     plt.axis('off')
     plt.show(block=False)
-
 
     if SAVEFIG:
         Path('./figures').mkdir(exist_ok=True)
