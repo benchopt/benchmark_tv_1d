@@ -15,7 +15,7 @@ class Dataset(BaseDataset):
     parameters = {
         'n_samples': [400],
         'n_features': [500],
-        'n_block': [10],
+        'num_block': [10],
         'mu': [0],
         'sigma': [0.1],
         'type_A': ['identity', 'random'],
@@ -23,12 +23,12 @@ class Dataset(BaseDataset):
         'random_state': [27]
     }
 
-    def __init__(self, n_samples=10, n_features=10, n_block=2,
-                 mu=0, sigma=0.3, type_A='identity', type_x='block',
+    def __init__(self, n_samples=5, n_features=5, num_block=1,
+                 mu=0, sigma=0.01, type_A='identity', type_x='block',
                  random_state=27):
         # Store the parameters of the dataset
         self.n_samples, self.n_features = n_samples, n_features
-        self.n_block = n_block
+        self.num_block = num_block
         self.mu, self.sigma = mu, sigma
         self.type_A, self.type_x = type_A, type_x
         self.random_state = random_state
@@ -46,11 +46,11 @@ class Dataset(BaseDataset):
         if self.type_x == 'sin':
             # A * cos + noise ~ N(mu, sigma)
             t = np.arange(self.n_features)
-            x = np.cos(np.pi*t/self.n_features * self.n_blocks)
+            x = np.cos(np.pi*t/self.n_features * self.num_blocks)
         else:
             # A * blocked signal + noise ~ N(mu, sigma)
             z = sprand(
-                1, self.n_features, density=self.n_block/self.n_features,
+                1, self.n_features, density=self.num_block/self.n_features,
                 random_state=rng
             ).toarray()[0]
             x = np.cumsum(rng.randn(self.n_features) * z)

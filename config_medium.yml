@@ -18,4 +18,4 @@ n-repetitions: 5
 timeout: 6000
 max-runs: 200
 
-output: tv1d-neurips
+output: tv1d_neurips
