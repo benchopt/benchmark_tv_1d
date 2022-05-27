@@ -12,7 +12,7 @@ class Solver(BaseSolver):
     name = 'ADMM analysis'
 
     stopping_criterion = SufficientDescentCriterion(
-        patience=20, strategy='callback'
+        patience=3, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute

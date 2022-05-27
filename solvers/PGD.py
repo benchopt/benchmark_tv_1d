@@ -17,7 +17,7 @@ class Solver(BaseSolver):
     requirements = ["blas-devel", 'pip:prox-tv']
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=5, strategy='callback'
+        patience=3, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute

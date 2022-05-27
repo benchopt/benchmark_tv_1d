@@ -1,5 +1,5 @@
 from benchopt import BaseSolver
-from benchopt.stopping_criterion import SufficientProgressCriterion
+from benchopt.stopping_criterion import SufficientDescentCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -10,8 +10,8 @@ class Solver(BaseSolver):
     """Fixed point with block updates for synthesis formulation."""
     name = 'FP synthesis'
 
-    stopping_criterion = SufficientProgressCriterion(
-        patience=50, strategy='callback'
+    stopping_criterion = SufficientDescentCriterion(
+        patience=3, strategy="callback"
     )
 
     # any parameter defined here is accessible as a class attribute

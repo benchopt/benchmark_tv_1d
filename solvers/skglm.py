@@ -19,7 +19,7 @@ class Solver(BaseSolver):
     name = 'skglm synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=10, strategy='iteration'
+        patience=3, strategy='iteration'
     )
 
     install_cmd = 'conda'
