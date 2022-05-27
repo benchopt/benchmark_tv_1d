@@ -76,13 +76,13 @@ IDX_ROWS = [
 
 IDX_COLUMNS = [
     {
-        ("n_features=500,n_samples=400,num_block=10", "", ""): (
+        ("n_features=500,n_samples=400,n_blocks=10", "", ""): (
             0, "n=400, K=10"
         ),
-        ("n_features=500,n_samples=400,num_block=50", "", ""): (
+        ("n_features=500,n_samples=400,n_blocks=50", "", ""): (
             1, "n=400, K=50"
         ),
-        ("n_features=500,n_samples=750,num_block=10", "", ""): (
+        ("n_features=500,n_samples=750,n_blocks=10", "", ""): (
             2, "n=750, K=10"
         ),
     }
