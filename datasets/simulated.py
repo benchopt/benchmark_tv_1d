@@ -4,6 +4,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import rand as sprand
+    from scipy.sparse.linalg import LinearOperator
 
 
 class Dataset(BaseDataset):
@@ -14,11 +15,11 @@ class Dataset(BaseDataset):
     # the cross product for each key in the dictionary.
     parameters = {
         'n_samples': [400],
-        'n_features': [500],
+        'n_features': [250],
         'n_blocks': [10],
         'mu': [0],
         'sigma': [0.1],
-        'type_A': ['identity', 'random'],
+        'type_A': ['identity', 'random', 'conv'],
         'type_x': ['block', 'sin'],
         'random_state': [27]
     }
@@ -33,12 +34,49 @@ class Dataset(BaseDataset):
         self.type_A, self.type_x = type_A, type_x
         self.random_state = random_state
 
+    def skip(self):
+        if ((self.type_A == 'identity' or self.type_A == 'random')
+           and self.n_samples != self.n_features) \
+           or (self.type_A == 'conv' and self.n_samples - self.n_features < 1):
+            return True, \
+                   "samples and features number don't match with type of A"
+        return False, None
+
     def get_A(self, rng):
-        if self.type_A == 'random':
-            A = rng.randn(self.n_samples, self.n_features)
-        else:
-            assert self.n_samples == self.n_features
-            A = np.identity(self.n_samples)
+        if self.type_A == 'identity':
+            A = LinearOperator(
+                dtype=np.float64,
+                matvec=lambda x: x,
+                matmat=lambda X: X,
+                rmatvec=lambda x: x,
+                rmatmat=lambda X: X,
+                shape=(self.n_samples, self.n_features),
+            )
+        elif self.type_A == 'random':
+            filt = rng.randn(self.n_samples, self.n_features)
+            A = LinearOperator(
+                dtype=np.float64,
+                matvec=lambda x: filt @ x,
+                matmat=lambda X: filt @ X,
+                rmatvec=lambda x: filt.T @ x,
+                rmatmat=lambda X: filt.T @ X,
+                shape=(self.n_samples, self.n_features),
+            )
+        elif self.type_A == 'conv':
+            len_A = self.n_samples - self.n_features + 1
+            filt = rng.randn(len_A)
+            A = LinearOperator(
+                dtype=np.float64,
+                matvec=lambda x: np.convolve(x, filt, mode='full'),
+                matmat=lambda X: np.array(
+                    [np.convolve(x, filt, mode='full') for x in X.T]
+                ).T,
+                rmatvec=lambda x: np.correlate(x, filt, mode='valid'),
+                rmatmat=lambda X: np.array(
+                    [np.correlate(x, filt, mode='valid') for x in X.T]
+                ).T,
+                shape=(self.n_samples, self.n_features)
+            )
         return A
 
     def get_data(self):

@@ -5,6 +5,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
+    from scipy.sparse.linalg import LinearOperator
 
 
 class Solver(BaseSolver):
@@ -30,7 +31,13 @@ class Solver(BaseSolver):
         data = np.array([-np.ones(p), np.ones(p)])
         diags = np.array([0, 1])
         D = spdiags(data, diags, p-1, p).toarray()
-        K = np.r_[D, self.A]
+        K = LinearOperator(
+            dtype=np.float64,
+            matvec=lambda x: np.r_[D @ x, self.A @ x],
+            rmatvec=lambda x: np.c_[D.T @ x[:p-1],
+                                    self.A @ x[p-1:]],
+            shape=(n + p - 1, p),
+        )
 
         # initialisation
         u = self.c * np.ones(p)

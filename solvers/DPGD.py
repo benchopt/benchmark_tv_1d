@@ -4,6 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    from scipy.sparse.linalg import LinearOperator
+    from scipy.sparse.linalg import cg
 
 
 class Solver(BaseSolver):
@@ -33,9 +35,11 @@ class Solver(BaseSolver):
     def run(self, callback):
         n, p = self.A.shape
         DA_inv = np.diff(np.linalg.pinv(self.A), axis=0)
-        DA_invDA_invt = DA_inv @ DA_inv.T
-        DA_invy = DA_inv @ self.y
-        AtA_inv = np.linalg.pinv(self.A.T @ self.A)
+        AtA = LinearOperator(
+            dtype=np.float64,
+            matvec=lambda x: self.A.T @ self.A @ x,
+            shape=(p, p)
+        )
         Aty = self.A.T @ self.y
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)
@@ -52,11 +56,12 @@ class Solver(BaseSolver):
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
                 v_old[:] = v
                 v[:] = v_acc
-            v = np.clip(v - stepsize * (DA_invDA_invt @ v - DA_invy),
+            v_tmp, _ = cg(AtA, Aty + np.diff(v, append=0, prepend=0))
+            v = np.clip(v + stepsize * np.diff(v_tmp),
                         -self.reg, self.reg)
             if self.use_acceleration:
                 v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
-            u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
+            u, _ = cg(AtA, Aty + np.diff(v, append=0, prepend=0))
         self.u = u
 
     def get_result(self):

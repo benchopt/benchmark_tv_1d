@@ -50,9 +50,9 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         n, p = self.A.shape
         L = np.tri(p)[:, 1:]
-        S = np.sum(self.A, axis=1)
+        S = self.A @ np.ones(self.A.shape[1])
         AL = self.A @ L
-        A_op = self.A @ np.ones((p, p)) @ (self.A.T) / (S @ S)
+        A_op = S[:, None] @ S[None, :] / (S @ S)
         y_new = self.y - A_op @ self.y
         AL_new = AL - A_op @ AL
 
