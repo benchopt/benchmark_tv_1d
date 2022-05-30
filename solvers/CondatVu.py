@@ -34,6 +34,7 @@ class Solver(BaseSolver):
         K = LinearOperator(
             dtype=np.float64,
             matvec=lambda x: np.r_[D @ x, self.A @ x],
+            matmat=lambda X: np.r_[D @ X, self.A @ X],
             rmatvec=lambda x: np.c_[D.T @ x[:p-1],
                                     self.A @ x[p-1:]],
             shape=(n + p - 1, p),
