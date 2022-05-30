@@ -38,6 +38,8 @@ class Solver(BaseSolver):
                                     self.A @ x[p-1:]],
             shape=(n + p - 1, p),
         )
+        norm_AtA = np.linalg.norm(self.A.T @ self.A @ np.identity(p), ord=2)
+        norm_K = np.linalg.norm(K @ np.identity(p), ord=2)
 
         # initialisation
         u = self.c * np.ones(p)
@@ -49,10 +51,9 @@ class Solver(BaseSolver):
         eta = self.eta
 
         if self.data_fit == 'quad':
-            tau = 1 / (np.linalg.norm(self.A.T @ self.A, ord=2) /
-                       2 + sigma * np.linalg.norm(D, ord=2) ** 2)
+            tau = 1 / (norm_AtA / 2 + sigma * np.linalg.norm(D, ord=2) ** 2)
         else:
-            tau = 1 / (sigma * np.linalg.norm(K, ord=2)**2)
+            tau = 1 / (sigma * norm_K ** 2)
 
         while callback(u):
             if self.data_fit == 'quad':
