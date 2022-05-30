@@ -1,4 +1,5 @@
 from benchopt import BaseSolver
+from benchopt.stopping_criterion import SufficientDescentCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -9,7 +10,9 @@ class Solver(BaseSolver):
     """Fixed point with block updates for synthesis formulation."""
     name = 'FP synthesis'
 
-    stopping_strategy = 'callback'
+    stopping_criterion = SufficientDescentCriterion(
+        patience=3, strategy="callback"
+    )
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.9]}
@@ -51,13 +54,3 @@ class Solver(BaseSolver):
         w -= np.clip(w, -mu, mu)
         w[0] = w0
         return w
-
-    def grad(self, A, u):
-        R = self.y - A @ u
-        if self.data_fit == 'quad':
-            return - A.T @ R
-        else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)

@@ -1,5 +1,5 @@
 from benchopt import BaseSolver
-from benchopt.stopping_criterion import SufficientProgressCriterion
+from benchopt.stopping_criterion import SufficientDescentCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -9,14 +9,14 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     """Alternating direction method for synthesis and analysis formulation."""
-    name = 'ADMM analysis and synthesis'
+    name = 'ADMM analysis'
 
-    stopping_criterion = SufficientProgressCriterion(
-        patience=20, strategy='callback'
+    stopping_criterion = SufficientDescentCriterion(
+        patience=3, strategy='callback'
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'gamma': [1.5, 1.9],
+    parameters = {'gamma': [1.9],
                   'update_pen': [False]}
 
     def skip(self, A, reg, y, c, delta, data_fit):

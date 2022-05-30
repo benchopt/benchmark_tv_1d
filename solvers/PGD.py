@@ -1,4 +1,5 @@
 from benchopt import BaseSolver
+from benchopt.stopping_criterion import SufficientProgressCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -11,9 +12,13 @@ class Solver(BaseSolver):
     name = 'Primal PGD analysis'
 
     install_cmd = 'conda'
-    requirements = ['pip:prox-tv']
 
-    stopping_strategy = "callback"
+    # We need blas devel to get the include file for BLAS/LAPACK operations
+    requirements = ["blas-devel", 'pip:prox-tv']
+
+    stopping_criterion = SufficientProgressCriterion(
+        patience=3, strategy='callback'
+    )
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.],

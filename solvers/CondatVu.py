@@ -1,5 +1,5 @@
 from benchopt import BaseSolver
-from benchopt.stopping_criterion import SufficientProgressCriterion
+from benchopt.stopping_criterion import SufficientDescentCriterion
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -11,12 +11,12 @@ class Solver(BaseSolver):
     """Primal-Dual Splitting Method for analysis formulation."""
     name = 'CondatVu analysis'
 
-    stopping_criterion = SufficientProgressCriterion(
-        patience=40, strategy='callback'
+    stopping_criterion = SufficientDescentCriterion(
+        patience=3, strategy="callback"
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'eta': [0.5, 1]}
+    parameters = {'eta': [1.]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg

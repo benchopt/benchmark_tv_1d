@@ -14,20 +14,23 @@ class Objective(BaseObjective):
                   'data_fit': ['quad', 'huber']
                   }
 
-    def set_data(self, A, y):
-        self.A = A
-        self.y = y
+    def set_data(self, A, y, x):
+        self.A, self.y, self.x = A, y, x
         S = np.sum(self.A, axis=1)
         self.c = self.get_c(S, self.delta)
         self.reg_scaled = self.reg*self.get_reg_max(self.c)
 
     def compute(self, u):
         R = self.y - self.A @ u
+        reg_TV = abs(np.diff(u)).sum()
         if self.data_fit == 'quad':
-            return .5 * R @ R + self.reg_scaled*(abs(np.diff(u)).sum())
+            loss = .5 * R @ R + self.reg_scaled * reg_TV
         else:
-            return self.huber(R, self.delta) \
-                + self.reg_scaled*(abs(np.diff(u)).sum())
+            loss = self.huber(R, self.delta) + self.reg_scaled * reg_TV
+
+        norm_x = np.linalg.norm(u - self.x)
+
+        return dict(value=loss, norm_x=norm_x)
 
     def get_one_solution(self):
         return np.zeros(self.A.shape[1])
@@ -55,7 +58,7 @@ class Objective(BaseObjective):
     def c_huber(self, S, delta):
         def f(c):
             R = self.y - S * c
-            return abs(self.grad_huber(R, delta).sum())
+            return abs((S * self.grad_huber(R, delta)).sum())
         yS = self.y / S
         return optimize.golden(f, brack=(min(yS), max(yS)))
 

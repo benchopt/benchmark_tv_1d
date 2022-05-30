@@ -19,15 +19,15 @@ class Solver(BaseSolver):
     name = 'skglm synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=10, strategy='iteration'
+        patience=3, strategy='iteration'
     )
 
     install_cmd = 'conda'
     requirements = ["pip:git+https://github.com/EnLAI111/skglm@Huber_datafit"]
     references = [
-        'M. Massias, A. Gramfort and J. Salmon, ICML, '
-        '"Celer: a Fast Solver for the Lasso with Dual Extrapolation", '
-        'vol. 80, pp. 3321-3330 (2018)'
+        'M. Massias, P. Bannier, Q. Klopfenstein and Q. Bertrand.'
+        '"skglm: Fast and modular Generalized Linear Models'
+        'with support for models missing in scikit-learn."'
     ]
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
@@ -47,7 +47,7 @@ class Solver(BaseSolver):
                 WeightedL1(self.reg / self.A.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
-                tol=1e-12, fit_intercept=False,
+                tol=0, fit_intercept=False,
                 warm_start=False, verbose=False,
             )
         else:
@@ -56,7 +56,7 @@ class Solver(BaseSolver):
                 WeightedL1(self.reg / self.A.shape[0], weights),
                 is_classif=False,
                 max_iter=1, max_epochs=100000,
-                tol=1e-12, fit_intercept=False,
+                tol=0, fit_intercept=False,
                 warm_start=False, verbose=False,
             )
         self.run(2)
