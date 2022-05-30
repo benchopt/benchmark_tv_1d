@@ -33,14 +33,14 @@ class Solver(BaseSolver):
         D = spdiags(data, diags, p-1, p).toarray()
         K = LinearOperator(
             dtype=np.float64,
-            matvec=lambda x: np.r_[D @ x, self.A @ x],
-            matmat=lambda X: np.r_[D @ X, self.A @ X],
-            rmatvec=lambda x: np.c_[D.T @ x[:p-1],
-                                    self.A @ x[p-1:]],
+            matvec=lambda x: np.r_[np.diff(x), self.A @ x],
+            matmat=lambda X: np.r_[np.diff(X, axis=0), self.A @ X],
+            rmatvec=lambda x: - np.diff(x[:p-1], append=0, prepend=0)
+            + self.A.T @ x[p-1:],
             shape=(n + p - 1, p),
         )
         norm_AtA = np.linalg.norm(self.A.T @ self.A @ np.identity(p), ord=2)
-        norm_K = np.linalg.norm(K @ np.identity(p), ord=2)
+        norm_K = np.linalg.norm(K @ np.eye(p, n + p - 1), ord=2)
 
         # initialisation
         u = self.c * np.ones(p)

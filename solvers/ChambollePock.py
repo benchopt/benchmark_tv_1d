@@ -4,7 +4,6 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    from scipy.sparse import spdiags
     from scipy.sparse.linalg import LinearOperator
     from scipy.sparse.linalg import cg
 
@@ -30,21 +29,18 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         n, p = self.A.shape
-        data = np.array([-np.ones(p), np.ones(p)])
-        diags = np.array([0, 1])
-        D = spdiags(data, diags, p-1, p).toarray()
         sigma = self.sigma
         tau = 1. / np.linalg.norm(self.A @ np.identity(p), ord=2)**2
         I_tauAtA = LinearOperator(
             dtype=np.float64,
-            matvec=lambda x: np.identity(p) @ x + tau * self.A.T @ self.A @ x,
+            matvec=lambda x: x + tau * self.A.T @ self.A @ x,
             shape=(p, p),
         )
         K = LinearOperator(
             dtype=np.float64,
-            matvec=lambda x: np.r_[D @ x, self.A @ x],
-            rmatvec=lambda x: np.c_[D.T @ x[:p-1],
-                                    self.A @ x[p-1:]],
+            matvec=lambda x: np.r_[np.diff(x), self.A @ x],
+            rmatvec=lambda x: - np.diff(x[:p-1], append=0, prepend=0)
+            + self.A.T @ x[p-1:],
             shape=(n + p - 1, p),
         )
 
