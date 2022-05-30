@@ -12,7 +12,7 @@ class Solver(BaseSolver):
     stopping_strategy = 'callback'
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'alpha': [1.9],
+    parameters = {'alpha': [1.],
                   'use_acceleration': [False, True]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
