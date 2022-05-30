@@ -4,6 +4,7 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    from scipy.sparse import spdiags
     from scipy.sparse.linalg import LinearOperator
     from scipy.sparse.linalg import cg
 
@@ -34,7 +35,10 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         n, p = self.A.shape
-        DA_inv = np.diff(np.linalg.pinv(self.A), axis=0)
+        data = np.array([-np.ones(p), np.ones(p)])
+        diags = np.array([0, 1])
+        D = spdiags(data, diags, p-1, p).toarray()
+        DA_inv = np.linalg.pinv(self.A @ np.linalg.pinv(D))
         AtA = LinearOperator(
             dtype=np.float64,
             matvec=lambda x: self.A.T @ self.A @ x,

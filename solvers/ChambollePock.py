@@ -34,7 +34,7 @@ class Solver(BaseSolver):
         diags = np.array([0, 1])
         D = spdiags(data, diags, p-1, p).toarray()
         sigma = self.sigma
-        tau = 1. / np.linalg.norm(self.A, ord=2)**2
+        tau = 1. / np.linalg.norm(self.A @ np.identity(p), ord=2)**2
         I_tauAtA = LinearOperator(
             dtype=np.float64,
             matvec=lambda x: np.identity(p) @ x + tau * self.A.T @ self.A @ x,

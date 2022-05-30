@@ -34,7 +34,8 @@ class Solver(BaseSolver):
     def run(self, callback):
         p = self.A.shape[1]
         # alpha / rho
-        stepsize = self.alpha / (np.linalg.norm(self.A, ord=2)**2)
+        stepsize = self.alpha / \
+            (np.linalg.norm(self.A @ np.identity(p), ord=2)**2)
         # initialisation
         u = self.c * np.ones(p)
         u_acc = u.copy()
