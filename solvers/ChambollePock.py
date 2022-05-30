@@ -4,7 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    from scipy.sparse import spdiags
+    from scipy.sparse.linalg import LinearOperator
+    from scipy.sparse.linalg import cg
 
 
 class Solver(BaseSolver):
@@ -28,14 +29,20 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         n, p = self.A.shape
-        data = np.array([-np.ones(p), np.ones(p)])
-        diags = np.array([0, 1])
-        D = spdiags(data, diags, p-1, p)
         sigma = self.sigma
-        tau = 1. / np.linalg.norm(self.A, ord=2)**2
-        I_tauAtA_inv = np.linalg.pinv(
-            np.identity(p) + tau * self.A.T @ self.A)
-        K = np.r_[D.toarray(), self.A]
+        tau = 1. / np.linalg.norm(self.A @ np.identity(p), ord=2)**2
+        I_tauAtA = LinearOperator(
+            dtype=np.float64,
+            matvec=lambda x: x + tau * self.A.T @ self.A @ x,
+            shape=(p, p),
+        )
+        K = LinearOperator(
+            dtype=np.float64,
+            matvec=lambda x: np.r_[np.diff(x), self.A @ x],
+            rmatvec=lambda x: - np.diff(x[:p-1], append=0, prepend=0)
+            + self.A.T @ x[p-1:],
+            shape=(n + p - 1, p),
+        )
 
         u = self.c * np.ones(p)
         v = np.zeros(p - 1)
@@ -49,8 +56,8 @@ class Solver(BaseSolver):
                 v = v_tmp - sigma * self.st(
                     v_tmp / sigma,
                     self.reg / sigma)
-                u = I_tauAtA_inv @ (u - tau * (-np.diff(v, append=0,
-                                    prepend=0)) + tau * self.A.T @ self.y)
+                u_tmp = u - tau * (-np.diff(v, append=0, prepend=0))
+                u, _ = cg(I_tauAtA, u_tmp + tau * self.A.T @ self.y)
             else:
                 x = w + tau * K @ u_bar
                 w[:p - 1] = x[:p - 1] - tau * \

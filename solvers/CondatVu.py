@@ -5,6 +5,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.sparse import spdiags
+    from scipy.sparse.linalg import LinearOperator
 
 
 class Solver(BaseSolver):
@@ -30,7 +31,16 @@ class Solver(BaseSolver):
         data = np.array([-np.ones(p), np.ones(p)])
         diags = np.array([0, 1])
         D = spdiags(data, diags, p-1, p).toarray()
-        K = np.r_[D, self.A]
+        K = LinearOperator(
+            dtype=np.float64,
+            matvec=lambda x: np.r_[np.diff(x), self.A @ x],
+            matmat=lambda X: np.r_[np.diff(X, axis=0), self.A @ X],
+            rmatvec=lambda x: - np.diff(x[:p-1], append=0, prepend=0)
+            + self.A.T @ x[p-1:],
+            shape=(n + p - 1, p),
+        )
+        norm_AtA = np.linalg.norm(self.A.T @ self.A @ np.identity(p), ord=2)
+        norm_K = np.linalg.norm(K @ np.eye(p, n + p - 1), ord=2)
 
         # initialisation
         u = self.c * np.ones(p)
@@ -42,10 +52,9 @@ class Solver(BaseSolver):
         eta = self.eta
 
         if self.data_fit == 'quad':
-            tau = 1 / (np.linalg.norm(self.A.T @ self.A, ord=2) /
-                       2 + sigma * np.linalg.norm(D, ord=2) ** 2)
+            tau = 1 / (norm_AtA / 2 + sigma * np.linalg.norm(D, ord=2) ** 2)
         else:
-            tau = 1 / (sigma * np.linalg.norm(K, ord=2)**2)
+            tau = 1 / (sigma * norm_K ** 2)
 
         while callback(u):
             if self.data_fit == 'quad':

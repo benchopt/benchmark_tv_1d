@@ -16,7 +16,7 @@ class Objective(BaseObjective):
 
     def set_data(self, A, y, x):
         self.A, self.y, self.x = A, y, x
-        S = np.sum(self.A, axis=1)
+        S = self.A @ np.ones(self.A.shape[1])
         self.c = self.get_c(S, self.delta)
         self.reg_scaled = self.reg*self.get_reg_max(self.c)
 
@@ -48,12 +48,9 @@ class Objective(BaseObjective):
 
     def get_c(self, S, delta):
         if self.data_fit == 'quad':
-            return self.c_quad(S)
+            return (S @ self.y)/(S @ S)
         else:
             return self.c_huber(S, delta)
-
-    def c_quad(self, S):
-        return (S @ self.y)/(S @ S)
 
     def c_huber(self, S, delta):
         def f(c):

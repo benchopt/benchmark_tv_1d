@@ -16,7 +16,7 @@ class Solver(BaseSolver):
     name = 'Celer synthesis'
 
     stopping_criterion = SufficientProgressCriterion(
-        patience=10, strategy='iteration'
+        patience=3, strategy='iteration'
     )
     install_cmd = 'conda'
     requirements = ['pip:celer']
@@ -42,7 +42,7 @@ class Solver(BaseSolver):
         self.lasso = Lasso(
             alpha=self.reg / self.A.shape[0], max_iter=1,
             max_epochs=100000,
-            tol=0, prune=True, fit_intercept=False,
+            tol=1e-15, prune=True, fit_intercept=False,
             warm_start=False, positive=False, verbose=False,
         )
         self.run(2)
@@ -50,9 +50,9 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         n, p = self.A.shape
         L = np.tri(p)[:, 1:]
-        S = np.sum(self.A, axis=1)
+        S = self.A @ np.ones(self.A.shape[1])
         AL = self.A @ L
-        A_op = self.A @ np.ones((p, p)) @ (self.A.T) / (S @ S)
+        A_op = S[:, None] @ S[None, :] / (S @ S)
         y_new = self.y - A_op @ self.y
         AL_new = AL - A_op @ AL
 

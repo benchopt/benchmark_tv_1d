@@ -27,14 +27,14 @@ class Solver(BaseSolver):
         self.data_fit = data_fit
 
     def run(self, callback):
+        n, p = self.A.shape
         # Block preconditioning (2x2)
         LD = 2.0  # Lipschitz constant associated to D (only for 1d!!)
-        LA = np.linalg.norm(self.A, ord=2)
+        LA = np.linalg.norm(self.A @ np.identity(p), ord=2)
         tau = self.ratio / (LA + LD)
         sigma_v = 1.0 / (self.ratio * LD)
         sigma_w = 1.0 / (self.ratio * LA)
         # Init variables
-        n, p = self.A.shape
         u = np.zeros(p)
         v = np.zeros(p - 1)  # we consider non-cyclic finite difference
         w = np.zeros(n)
