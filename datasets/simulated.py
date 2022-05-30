@@ -24,6 +24,13 @@ class Dataset(BaseDataset):
         'random_state': [27]
     }
 
+    # This makes sure that for each solver, we have one simulated dataset that
+    # will be compatible in the test_solver.
+    test_parameters = {
+        'type_A': ['random', 'conv'],
+        'n_samples, n_features': [(10, 5)]
+    }
+
     def __init__(self, n_samples=5, n_features=5, n_blocks=1,
                  mu=0, sigma=0.01, type_A='identity', type_x='block',
                  random_state=27):
@@ -35,11 +42,13 @@ class Dataset(BaseDataset):
         self.random_state = random_state
 
     def skip(self):
-        if ((self.type_A == 'identity' or self.type_A == 'random')
-           and self.n_samples != self.n_features) \
-           or (self.type_A == 'conv' and self.n_samples - self.n_features < 1):
+        if (self.type_A == 'identity' or self.type_A == 'random') \
+           and self.n_samples != self.n_features:
             return True, \
-                   "samples and features number don't match with type of A"
+                "samples and features number don't match with type of A"
+        elif self.type_A == 'conv' and self.n_samples - self.n_features < 1:
+            return True, \
+                "samples and features number don't match with type of A"
         return False, None
 
     def get_A(self, rng):
@@ -53,15 +62,7 @@ class Dataset(BaseDataset):
                 shape=(self.n_samples, self.n_features),
             )
         elif self.type_A == 'random':
-            filt = rng.randn(self.n_samples, self.n_features)
-            A = LinearOperator(
-                dtype=np.float64,
-                matvec=lambda x: filt @ x,
-                matmat=lambda X: filt @ X,
-                rmatvec=lambda x: filt.T @ x,
-                rmatmat=lambda X: filt.T @ X,
-                shape=(self.n_samples, self.n_features),
-            )
+            A = rng.randn(self.n_samples, self.n_features)
         elif self.type_A == 'conv':
             len_A = self.n_samples - self.n_features + 1
             filt = rng.randn(len_A)
