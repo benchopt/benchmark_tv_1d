@@ -44,7 +44,7 @@ class Solver(BaseSolver):
                                   gamma * np.diff(np.diff(x),
                                                   append=0, prepend=0))
 
-        while callback(np.r_[self.c, np.cumsum(z)]):
+        while callback(u):
             z_old = z
             u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
                      - gamma * np.diff(z, append=0, prepend=0)
