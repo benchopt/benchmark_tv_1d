@@ -40,14 +40,15 @@ class Solver(BaseSolver):
         gamma = self.gamma
         Aty = self.A.T @ self.y
         AtA_gDtD = LinearOperator(shape=(p, p),
-                                  matvec=lambda x: self.A.T @ (self.A @ x) -
+                                  matvec=lambda x: self.A.T @ self.A @ x -
                                   gamma * np.diff(np.diff(x),
                                                   append=0, prepend=0))
 
-        while callback(u):
+        while callback(np.r_[self.c, np.cumsum(z)]):
             z_old = z
-            u_tmp = Aty + np.diff(mu, append=0, prepend=0) - \
-                gamma * np.diff(z, append=0, prepend=0)
+            u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
+                     - gamma * np.diff(z, append=0, prepend=0)
+                     )
             u, _ = cg(AtA_gDtD, u_tmp)
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)

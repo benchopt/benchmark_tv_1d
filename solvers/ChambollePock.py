@@ -60,15 +60,16 @@ class Solver(BaseSolver):
                 u, _ = cg(I_tauAtA, u_tmp + tau * self.A.T @ self.y)
             else:
                 x = w + tau * K @ u_bar
-                w[:p - 1] = x[:p - 1] - tau * \
-                    self.st(x[:p - 1] / tau,
-                            self.reg / tau)
+                w[:p - 1] = (x[:p - 1] - tau *
+                             self.st(x[:p - 1] / tau,
+                                     self.reg / tau)
+                             )
                 R = tau * self.y - x[p - 1:]
-                w[p - 1:] = x[p - 1:] - \
-                    np.where(abs(R) < self.delta * (tau + 1),
-                             tau *
-                             (self.y + x[p - 1:]) / (tau + 1),
-                             x[p - 1:] + self.delta * np.sign(R))
+                w[p - 1:] = (x[p - 1:]
+                             - np.where(abs(R) < self.delta * (tau + 1),
+                                        tau * (self.y + x[p - 1:]) / (tau + 1),
+                                        x[p - 1:] + self.delta * np.sign(R))
+                             )
                 u -= tau * K.T @ w
             u_bar = u + self.theta * (u - u_old)
         self.u = u

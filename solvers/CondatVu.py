@@ -58,27 +58,33 @@ class Solver(BaseSolver):
 
         while callback(u):
             if self.data_fit == 'quad':
-                u_tmp = u - tau * self.A.T @ (self.A @ u - self.y) - \
-                    tau * (-np.diff(v, append=0, prepend=0))
-                v_tmp = v + sigma * np.diff(2 * u_tmp - u) - \
-                    sigma * self.st(v / sigma +
-                                    np.diff(2 * u_tmp - u),
-                                    self.reg / sigma)
+                u_tmp = (u - tau * self.A.T @ (self.A @ u - self.y)
+                         - tau * (-np.diff(v, append=0, prepend=0))
+                         )
+                v_tmp = (v + sigma * np.diff(2 * u_tmp - u)
+                         - sigma * self.st(v / sigma +
+                                           np.diff(2 * u_tmp - u),
+                                           self.reg / sigma)
+                         )
                 u = eta * u_tmp + (1 - eta)*u
                 v = eta * v_tmp + (1 - eta)*v
             else:
                 u_tmp = u - tau * K.T @ w
 
                 x_tmp = w + sigma * K @ (2 * u_tmp - u)
-                w_tmp[:p - 1] = x_tmp[:p - 1] - \
-                    sigma * self.st(x_tmp[:p - 1] /
-                                    sigma, self.reg / sigma)
+                x_tmp_1 = x_tmp[:p - 1]
+                w_tmp[:p - 1] = x_tmp_1 - sigma * self.st(x_tmp_1 / sigma,
+                                                          self.reg / sigma)
+                x_tmp_2 = x_tmp[p - 1:]
                 R_tmp = sigma * self.y - x_tmp[p - 1:]
-                w_tmp[p - 1:] = x_tmp[p - 1:] - \
-                    np.where(abs(R_tmp) < self.delta * (sigma + 1),
-                             sigma *
-                             (self.y + x_tmp[p - 1:]) / (sigma + 1),
-                             x_tmp[p - 1:] + self.delta * np.sign(R_tmp))
+                w_tmp[p - 1:] = (x_tmp_2
+                                 - np.where(abs(R_tmp) < (self.delta
+                                                          * (sigma + 1)),
+                                            sigma * ((self.y + x_tmp_2)
+                                                     / (sigma + 1)),
+                                            x_tmp_2 + (self.delta
+                                                       * np.sign(R_tmp)))
+                                 )
                 u = eta * u_tmp + (1 - eta)*u
                 w = eta * w_tmp + (1 - eta)*w
         self.u = u
