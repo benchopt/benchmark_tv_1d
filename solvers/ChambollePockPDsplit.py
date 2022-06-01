@@ -30,7 +30,7 @@ class Solver(BaseSolver):
         n, p = self.A.shape
         # Block preconditioning (2x2)
         LD = 2.0  # Lipschitz constant associated to D (only for 1d!!)
-        LA = np.linalg.norm(self.A @ np.identity(p), ord=2)
+        LA = self.get_l2norm(self.A)
         tau = self.ratio / (LA + LD)
         sigma_v = 1.0 / (self.ratio * LD)
         sigma_w = 1.0 / (self.ratio * LA)
@@ -67,3 +67,14 @@ class Solver(BaseSolver):
             u / (mu + 1.0),
             u - self.delta * mu * np.sign(u),
         )
+
+    def get_l2norm(self, A, n_iter=100):
+        if isinstance(A, np.ndarray):
+            return np.linalg.norm(A, ord=2)
+        else:
+            AtA = A.T @ A
+            x = np.random.randn(AtA.shape[0])
+            for _ in range(n_iter):
+                x = AtA @ x
+                x /= np.linalg.norm(x)
+            return np.sqrt(np.linalg.norm(AtA @ x))

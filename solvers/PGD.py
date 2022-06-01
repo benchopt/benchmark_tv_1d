@@ -34,8 +34,7 @@ class Solver(BaseSolver):
     def run(self, callback):
         p = self.A.shape[1]
         # alpha / rho
-        stepsize = (self.alpha /
-                    (np.linalg.norm(self.A @ np.identity(p), ord=2)**2))
+        stepsize = self.alpha / self.get_l2norm(self.A)**2
         # initialisation
         u = self.c * np.ones(p)
         u_acc = u.copy()
@@ -67,3 +66,14 @@ class Solver(BaseSolver):
 
     def grad_huber(self, R, delta):
         return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
+
+    def get_l2norm(self, A, n_iter=100):
+        if isinstance(A, np.ndarray):
+            return np.linalg.norm(A, ord=2)
+        else:
+            AtA = A.T @ A
+            x = np.random.randn(AtA.shape[0])
+            for _ in range(n_iter):
+                x = AtA @ x
+                x /= np.linalg.norm(x)
+            return np.sqrt(np.linalg.norm(AtA @ x))
