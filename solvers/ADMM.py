@@ -41,12 +41,14 @@ class Solver(BaseSolver):
         gamma = self.gamma
         tol_cg = 1e-12
         Aty = self.A.T @ self.y
-        if type(self.A) == np.ndarray:
+        if isinstance(self.A, np.ndarray):
             data = np.array([-np.ones(p), np.ones(p)])
             diags = np.array([0, 1])
             D = spdiags(data, diags, p-1, p)
             AtA_gDtD_inv = np.linalg.pinv(self.A.T @ self.A + gamma * D.T @ D)
         else:
+            # D @ x = np.diff(x)
+            # D.T @ x = -np.diff(x, append=0, prepend=0)
             AtA_gDtD = LinearOperator(shape=(p, p),
                                       matvec=lambda x: self.A.T @ (self.A @ x)
                                       - gamma * np.diff(np.diff(x),
@@ -56,7 +58,7 @@ class Solver(BaseSolver):
             z_old = z
             u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
                      - gamma * np.diff(z, append=0, prepend=0))
-            if type(self.A) == np.ndarray:
+            if isinstance(self.A, np.ndarray):
                 u = np.ravel(AtA_gDtD_inv @ u_tmp)
             else:
                 u, _ = cg(AtA_gDtD, u_tmp, x0=u, tol=tol_cg)
