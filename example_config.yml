@@ -8,7 +8,6 @@ dataset:
 solver:
   - admm analysis
   - celer synthesis
-  - Chambolle-Pock analysis
   - Chambolle-Pock PD-split analysis
   - CondatVu analysis
   - Dual PGD analysis

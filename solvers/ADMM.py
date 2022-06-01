@@ -40,7 +40,7 @@ class Solver(BaseSolver):
         gamma = self.gamma
         Aty = self.A.T @ self.y
         AtA_gDtD = LinearOperator(shape=(p, p),
-                                  matvec=lambda x: self.A.T @ self.A @ x -
+                                  matvec=lambda x: self.A.T @ (self.A @ x) -
                                   gamma * np.diff(np.diff(x),
                                                   append=0, prepend=0))
 
