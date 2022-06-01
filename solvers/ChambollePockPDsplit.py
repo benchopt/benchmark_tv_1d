@@ -38,7 +38,7 @@ class Solver(BaseSolver):
         u = np.zeros(p)
         v = np.zeros(p - 1)  # we consider non-cyclic finite difference
         w = np.zeros(n)
-        u_bar = u
+        u_bar = u.copy()
 
         while callback(u):
             u_old = u

@@ -41,16 +41,6 @@ class Dataset(BaseDataset):
         self.type_A, self.type_x = type_A, type_x
         self.random_state = random_state
 
-    def skip(self):
-        if (self.type_A == 'identity' or self.type_A == 'random') \
-           and self.n_samples != self.n_features:
-            return True, \
-                "samples and features number don't match with type of A"
-        elif self.type_A == 'conv' and self.n_samples - self.n_features < 1:
-            return True, \
-                "samples and features number don't match with type of A"
-        return False, None
-
     def get_A(self, rng):
         if self.type_A == 'identity':
             A = LinearOperator(
