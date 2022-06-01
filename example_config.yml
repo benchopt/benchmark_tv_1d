@@ -4,6 +4,7 @@ objective:
 dataset:
   - Simulated[n_samples=40,n_features=25,type_A=conv,type_x=sin]
   - Simulated[n_samples=40,n_features=25,type_A=conv,type_x=block]
+  - Simulated[n_samples=40,n_features=40,type_A=random,type_x=sin]
   - Simulated[n_samples=40,n_features=40,type_A=random,type_x=block]
 solver:
   - admm analysis

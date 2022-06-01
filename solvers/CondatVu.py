@@ -42,27 +42,23 @@ class Solver(BaseSolver):
         while callback(u):
             if self.data_fit == 'quad':
                 u_tmp = (u - tau * self.A.T @ (self.A @ u - self.y)
-                         - tau * (-np.diff(v, append=0, prepend=0))
-                         )
+                         - tau * (-np.diff(v, append=0, prepend=0)))
             else:
                 u_tmp = (u
                          - tau * (- np.diff(v, append=0, prepend=0)
-                                  + self.A.T @ w)
-                         )
+                                  + self.A.T @ w))
                 w_tmp = w + sigma_w * self.A @ (2 * u_tmp - u)
                 R_tmp = sigma_w * self.y - w_tmp
                 w_tmp = (w_tmp
                          - np.where(abs(R_tmp) < (self.delta * (sigma_w + 1)),
                                     sigma_w * ((self.y + w_tmp)
                                                / (sigma_w + 1)),
-                                    w_tmp + (self.delta * np.sign(R_tmp)))
-                         )
+                                    w_tmp + (self.delta * np.sign(R_tmp))))
                 w = eta * w_tmp + (1 - eta) * w
             v_tmp = (v + sigma_v * np.diff(2 * u_tmp - u)
                      - sigma_v * self.st(v / sigma_v +
                                          np.diff(2 * u_tmp - u),
-                                         self.reg / sigma_v)
-                     )
+                                         self.reg / sigma_v))
             u = eta * u_tmp + (1 - eta) * u
             v = eta * v_tmp + (1 - eta) * v
         self.u = u
