@@ -1,4 +1,4 @@
-import numpy as  np
+import numpy as np
 
 
 def get_l2norm(A, n_iter=100):
