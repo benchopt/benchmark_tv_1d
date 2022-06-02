@@ -71,9 +71,8 @@ class Solver(BaseSolver):
         if isinstance(A, np.ndarray):
             return np.linalg.norm(A, ord=2)
         else:
-            AtA = A.T @ A
-            x = np.random.randn(AtA.shape[0])
+            x = np.random.randn(A.shape[1])
             for _ in range(n_iter):
-                x = AtA @ x
+                x = A.T @ (A @ x)
                 x /= np.linalg.norm(x)
-            return np.sqrt(np.linalg.norm(AtA @ x))
+            return np.sqrt(np.linalg.norm(A.T @ (A @ x)))
