@@ -4,6 +4,7 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    get_l2norm = import_ctx.import_from('shared', 'get_l2norm')
 
 
 class Solver(BaseSolver):
@@ -29,7 +30,7 @@ class Solver(BaseSolver):
         n, p = self.A.shape
         # Block preconditioning (2x2)
         LD = 2.0  # Lipschitz constant associated to D (only for 1d!!)
-        LA = self.get_l2norm(self.A)
+        LA = get_l2norm(self.A)
         sigma_v = 1.0 / (self.ratio * LD)
         sigma_w = 1.0 / (self.ratio * LA)
         tau = 1 / (LA ** 2 / 2 + sigma_v * LD ** 2)
@@ -69,13 +70,3 @@ class Solver(BaseSolver):
     def st(self, w, mu):
         w -= np.clip(w, -mu, mu)
         return w
-
-    def get_l2norm(self, A, n_iter=100):
-        if isinstance(A, np.ndarray):
-            return np.linalg.norm(A, ord=2)
-        else:
-            x = np.random.randn(A.shape[1])
-            for _ in range(n_iter):
-                x = A.T @ (A @ x)
-                x /= np.linalg.norm(x)
-            return np.sqrt(np.linalg.norm(A.T @ (A @ x)))

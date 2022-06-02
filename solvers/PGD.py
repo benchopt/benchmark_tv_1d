@@ -5,6 +5,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     import prox_tv as ptv
+    get_l2norm = import_ctx.import_from('shared', 'get_l2norm')
 
 
 class Solver(BaseSolver):
@@ -34,7 +35,7 @@ class Solver(BaseSolver):
     def run(self, callback):
         p = self.A.shape[1]
         # alpha / rho
-        stepsize = self.alpha / self.get_l2norm(self.A)**2
+        stepsize = self.alpha / get_l2norm(self.A)**2
         # initialisation
         u = self.c * np.ones(p)
         u_acc = u.copy()
@@ -66,13 +67,3 @@ class Solver(BaseSolver):
 
     def grad_huber(self, R, delta):
         return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
-
-    def get_l2norm(self, A, n_iter=100):
-        if isinstance(A, np.ndarray):
-            return np.linalg.norm(A, ord=2)
-        else:
-            x = np.random.randn(A.shape[1])
-            for _ in range(n_iter):
-                x = A.T @ (A @ x)
-                x /= np.linalg.norm(x)
-            return np.sqrt(np.linalg.norm(A.T @ (A @ x)))
