@@ -1,6 +1,6 @@
 objective:
-  - TV1D[data_fit=quad,delta=0,reg=0.5]
-  - TV1D[data_fit=huber,delta=0.9,reg=0.5]
+  - TV1D[data_fit=quad,delta=0,reg=[0.5, 0.1]]
+  - TV1D[data_fit=huber,delta=0.9,reg=[0.5, 0.1]]
 dataset:
   - Simulated[n_samples=40,n_features=25,type_A=conv,type_x=sin]
   - Simulated[n_samples=40,n_features=25,type_A=conv,type_x=block]
@@ -16,6 +16,6 @@ solver:
   - Primal PGD synthesis*
   - Primal PGD analysis
   - skglm synthesis
-n-repetitions: 1
-timeout: 100
+n-repetitions: 5
+timeout: 1200
 max-runs: 100

@@ -42,11 +42,11 @@ class Solver(BaseSolver):
         else:
             D_inv = np.linspace(1/p - 1, - 1/p, p-1) + np.tri(p)[:, 1:]
             DA_inv = np.linalg.pinv(self.A @ D_inv)
-        AtA = LinearOperator(
-            dtype=np.float64,
-            matvec=lambda x: self.A.T @ self.A @ x,
-            shape=(p, p)
-        )
+            AtA = LinearOperator(
+                dtype=np.float64,
+                matvec=lambda x: self.A.T @ self.A @ x,
+                shape=(p, p)
+            )
         Aty = self.A.T @ self.y
         tol_cg = 1e-12
         # alpha / rho
@@ -73,8 +73,10 @@ class Solver(BaseSolver):
                               x0=v_tmp, tol=tol_cg)
                 v = np.clip(v + stepsize * np.diff(v_tmp),
                             -self.reg, self.reg)
+
             if self.use_acceleration:
                 v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
+
             if isinstance(self.A, np.ndarray):
                 u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
             else:
