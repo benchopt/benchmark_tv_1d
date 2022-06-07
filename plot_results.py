@@ -41,7 +41,7 @@ MIN_XLIM = 1e-3
 GPU_SOLVERS = []
 DICT_XLIM = {}
 
-YTICKS = (1e8, 1e4, 1, 1e-4, 1e-8)
+YTICKS = (1e4, 1, 1e-4, 1e-8)
 
 IDX_ROWS = [
     {
