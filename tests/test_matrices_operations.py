@@ -1,8 +1,5 @@
 import numpy as np
 from scipy.sparse import spdiags
-from scipy.sparse import rand as sprand
-from scipy.sparse.linalg import LinearOperator
-from scipy.sparse.linalg import cg
 from solvers.DPGD import get_inverse_D
 
 
