@@ -5,6 +5,7 @@ def get_l2norm(A, n_iter=100):
     if isinstance(A, np.ndarray):
         return np.linalg.norm(A, ord=2)
     else:
+        # multiplication for the smaller size of matrice
         if A.shape[0] < A.shape[1]:
             A = A.T
         AtA = A.T @ A
