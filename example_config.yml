@@ -19,5 +19,3 @@ solver:
 n-repetitions: 5
 timeout: 1200
 max-runs: 100
-
-output: tv1d
