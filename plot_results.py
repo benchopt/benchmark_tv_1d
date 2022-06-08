@@ -36,7 +36,7 @@ BENCH_FILES = [
     './outputs/tv1d.csv',
 ]
 FLOATING_PRECISION = 1e-8
-MIN_XLIM = 1e-3
+MIN_XLIM = 1e-4
 
 GPU_SOLVERS = []
 DICT_XLIM = {}
