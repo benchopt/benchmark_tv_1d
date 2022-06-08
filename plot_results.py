@@ -33,7 +33,7 @@ PLOT_COLUMN = "objective_value"
 fignames = ["tv1d", "tv1d_norm_x"]
 
 BENCH_FILES = [
-    './outputs/benchopt_run_2022-06-07_08h50m25.csv',
+    './outputs/tv1d.csv',
 ]
 FLOATING_PRECISION = 1e-8
 MIN_XLIM = 1e-3
