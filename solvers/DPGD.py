@@ -8,6 +8,10 @@ with safe_import_context() as import_ctx:
     from scipy.sparse.linalg import cg
 
 
+def get_inverse_D(p):
+    return - np.arange(1, p, 1) / p + np.tri(p)[:, 1:]
+
+
 class Solver(BaseSolver):
     """Dual Projected gradient descent for analysis formulation."""
     name = 'Dual PGD analysis'
@@ -23,6 +27,8 @@ class Solver(BaseSolver):
     def skip(self, A, reg, y, c, delta, data_fit):
         if data_fit == 'huber':
             return True, "solver does not work with huber loss"
+        if max(y.shape) > 1e4:
+            return True, "solver has to do a too large densification"
         return False, None
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
@@ -40,13 +46,12 @@ class Solver(BaseSolver):
             DA_invy = DA_inv @ self.y
             AtA_inv = np.linalg.pinv(self.A.T @ self.A)
         else:
-            D_inv = np.linspace(1/p - 1, - 1/p, p-1) + np.tri(p)[:, 1:]
-            DA_inv = np.linalg.pinv(self.A @ D_inv)
-        AtA = LinearOperator(
-            dtype=np.float64,
-            matvec=lambda x: self.A.T @ self.A @ x,
-            shape=(p, p)
-        )
+            DA_inv = np.diff(np.linalg.pinv(self.A @ np.identity(p)), axis=0)
+            AtA = LinearOperator(
+                dtype=np.float64,
+                matvec=lambda x: self.A.T @ self.A @ x,
+                shape=(p, p)
+            )
         Aty = self.A.T @ self.y
         tol_cg = 1e-12
         # alpha / rho
@@ -73,8 +78,10 @@ class Solver(BaseSolver):
                               x0=v_tmp, tol=tol_cg)
                 v = np.clip(v + stepsize * np.diff(v_tmp),
                             -self.reg, self.reg)
+
             if self.use_acceleration:
                 v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
+
             if isinstance(self.A, np.ndarray):
                 u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
             else:

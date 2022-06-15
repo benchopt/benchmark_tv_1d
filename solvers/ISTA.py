@@ -15,6 +15,11 @@ class Solver(BaseSolver):
     parameters = {'alpha': [1., 1.9],
                   'use_acceleration': [False, True]}
 
+    def skip(self, A, reg, y, c, delta, data_fit):
+        if self.use_acceleration and self.alpha > 1:
+            return True, "FISTA only converge when stepsize <= 1/L"
+        return False, None
+
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y

@@ -17,11 +17,6 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.9]}
 
-    def skip(self, A, reg, y, c, delta, data_fit):
-        if data_fit == 'huber':
-            return True, "solver does not work with huber loss"
-        return False, None
-
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
@@ -41,7 +36,7 @@ class Solver(BaseSolver):
         mu = np.zeros((p, p))
         nu = np.zeros(p)
         while callback(np.cumsum(z)):
-            mu = z - stepsize * (n * (AL @ z - self.y) * AL.T).T
+            mu = z - stepsize * (n * self.grad(AL, z) * AL.T).T
             nu = np.mean(mu, axis=0)
             z = self.st(nu, stepsize * self.reg)
         self.u = np.cumsum(z)
@@ -54,3 +49,13 @@ class Solver(BaseSolver):
         w -= np.clip(w, -mu, mu)
         w[0] = w0
         return w
+
+    def grad(self, A, u):
+        R = self.y - A @ u
+        if self.data_fit == 'quad':
+            return - R
+        else:
+            return - self.grad_huber(R, self.delta)
+
+    def grad_huber(self, R, delta):
+        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)

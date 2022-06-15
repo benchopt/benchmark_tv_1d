@@ -2,11 +2,13 @@ objective:
   - TV1D[data_fit=quad,delta=0,reg=[0.5, 0.1]]
   - TV1D[data_fit=huber,delta=0.9,reg=[0.5, 0.1]]
 dataset:
-  - Simulated[n_samples=[400, 750],n_features=500,type_A=random,n_blocks=[10, 50],type_x=block]
+  - Simulated[n_samples=400,n_features=250,type_A=conv,type_x=sin]
+  - Simulated[n_samples=400,n_features=250,type_A=conv,type_x=block]
+  - Simulated[n_samples=400,n_features=400,type_A=random,type_x=sin]
+  - Simulated[n_samples=400,n_features=400,type_A=random,type_x=block]
 solver:
   - admm analysis
   - celer synthesis
-  - Chambolle-Pock analysis
   - Chambolle-Pock PD-split analysis
   - CondatVu analysis
   - Dual PGD analysis
@@ -18,4 +20,4 @@ n-repetitions: 5
 timeout: 6000
 max-runs: 200
 
-output: tv1d_neurips
+output: tv1d

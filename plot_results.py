@@ -10,8 +10,8 @@ import matplotlib as mpl
 
 usetex = mpl.checkdep_usetex(True)
 params = {
-    "font.family": "sans-serif",
-    "font.sans-serif": ["Computer Modern Roman"],
+    "font.family": "serif",
+    "font.serif": ["Times New Roman"],
     "text.usetex": usetex,
 }
 mpl.rcParams.update(params)
@@ -30,60 +30,63 @@ regex = re.compile(r'\[(.*?)\]')
 
 SAVEFIG = True
 PLOT_COLUMN = "objective_value"
-fignames = ["tv1d_supp_mat", "tv1d_supp_mat_norm_x"]
+fignames = ["tv1d", "tv1d_norm_x"]
 
 BENCH_FILES = [
-    './outputs/tv1d_neurips.csv',
+    './outputs/tv1d.csv',
 ]
 FLOATING_PRECISION = 1e-8
-MIN_XLIM = 1e-3
+MIN_XLIM = 1e-4
 
 GPU_SOLVERS = []
 DICT_XLIM = {}
 
-YTICKS = (1e8, 1e4, 1, 1e-4, 1e-8)
+YTICKS = (1e4, 1, 1e-4, 1e-8)
 
 IDX_ROWS = [
     {
-        ("", "data_fit=quad,delta=0,reg=0.5", "objective_value"): (
-            0, r"$\ell_2$\\[.5em]$\lambda=0.5\lambda_{\max}$"
-        ),
         ("", "data_fit=quad,delta=0,reg=0.1", "objective_value"): (
-            1, r"$\ell_2$\\[.5em]$\lambda=0.1\lambda_{\max}$"
+            0, r"$\ell_2$, $\lambda=0.1\lambda_{\max}$"
         ),
-        ("", "data_fit=huber,delta=0.9,reg=0.5", "objective_value"): (
-            2, r"Huber[$\mu=0.9$]\\[.5em]$\lambda=0.5\lambda_{\max}$"
+        ("", "data_fit=quad,delta=0,reg=0.5", "objective_value"): (
+            1, r"$\ell_2$, $\lambda=0.5\lambda_{\max}$"
         ),
         ("", "data_fit=huber,delta=0.9,reg=0.1", "objective_value"): (
-            3, r"Huber[$\mu=0.9$]\\[.5em]$\lambda=0.1\lambda_{\max}$"
+            2, r"Huber[$\mu=0.9$], $\lambda=0.1\lambda_{\max}$"
+        ),
+        ("", "data_fit=huber,delta=0.9,reg=0.5", "objective_value"): (
+            3, r"Huber[$\mu=0.9$], $\lambda=0.5\lambda_{\max}$"
         )
     },
     {
-        ("", "data_fit=quad,delta=0,reg=0.5", "objective_norm_x"): (
-            0, r"$\ell_2$ reg=0.5 -- $\|x - u\|_2$"
-        ),
         ("", "data_fit=quad,delta=0,reg=0.1", "objective_norm_x"): (
-            1, r"$\ell_2$ reg=0.1 -- $\|x - u\|_2$"
+            0, r"$\ell_2$ reg=0.1 -- $\|x - u\|_2$"
         ),
-        ("", "data_fit=huber,delta=0.9,reg=0.5", "objective_norm_x"): (
-            2, r"Huber[$\mu=0.9$] reg=0.5 -- $\|x - u\|_2$"
+        ("", "data_fit=quad,delta=0,reg=0.5", "objective_norm_x"): (
+            1, r"$\ell_2$ reg=0.5 -- $\|x - u\|_2$"
         ),
         ("", "data_fit=huber,delta=0.9,reg=0.1", "objective_norm_x"): (
-            3, r"Huber reg=0.1 -- $\|x - u\|_2$"
+            2, r"Huber reg=0.1 -- $\|x - u\|_2$"
+        ),
+        ("", "data_fit=huber,delta=0.9,reg=0.5", "objective_norm_x"): (
+            3, r"Huber reg=0.5 -- $\|x - u\|_2$"
         )
     }
 ]
 
 IDX_COLUMNS = [
     {
-        ("n_features=500,n_samples=400,n_blocks=10", "", ""): (
-            0, "n=400, K=10"
+        ("type_A=conv,type_x=sin", "", ""): (
+            0, "type_A=conv,type_x=sin"
         ),
-        ("n_features=500,n_samples=400,n_blocks=50", "", ""): (
-            1, "n=400, K=50"
+        ("type_A=conv,type_x=block", "", ""): (
+            1, "type_A=conv,type_x=block"
         ),
-        ("n_features=500,n_samples=750,n_blocks=10", "", ""): (
-            2, "n=750, K=10"
+        ("type_A=random,type_x=sin", "", ""): (
+            2, "type_A=random,type_x=sin"
+        ),
+        ("type_A=random,type_x=block", "", ""): (
+            3, "type_A=random,type_x=block"
         ),
     }
 ] * 2
@@ -92,17 +95,21 @@ all_solvers = {
     'ADMM analysis[gamma=1.9,update_pen=False]': "ADMM (A)",
     'Primal PGD analysis[alpha=1.0,use_acceleration=False]': "PGD (A)",
     'Primal PGD analysis[alpha=1.0,use_acceleration=True]': "APGD (A)",
-    'Chambolle-Pock analysis[sigma=0.5,theta=1.0]': "Chambolle-Pock (A)",
     'Chambolle-Pock PD-split analysis[ratio=1.0,theta=1.0]': (
-        "Chambolle-Pock split (A)"
+        "Chambolle-Pock (A)"
     ),
-    'CondatVu analysis[eta=1.0]': "Condat-Vu (A)",
-    'Dual PGD analysis[alpha=1.0,use_acceleration=False]': "Dual PGD (D)",
-    'Dual PGD analysis[alpha=1.0,use_acceleration=True]': "Dual APGD (D)",
+    'CondatVu analysis[eta=1.0,ratio=1.0]': "Condat-Vu (A)",
+    'Dual PGD analysis[alpha=1.0,use_acceleration=False]': "Dual PGD (A)",
+    'Dual PGD analysis[alpha=1.0,use_acceleration=True]': "Dual APGD (A)",
     'Celer synthesis': "celer (S)",
     'FP synthesis[alpha=1.9]': "FP (S)",
-    'Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=False]': "PGD (S)",
-    'Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=True]': "APGD (S)",
+    'Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=False]': (
+        "PGD(1/L) (S)"
+    ),
+    'Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=False]': (
+        "PGD(1.9/L) (S)",
+    ),
+    'Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=True]': "APGD (S)",
     'skglm synthesis': "skglm (S)",
 }
 
@@ -111,8 +118,8 @@ solvers = df["solver_name"].unique()
 STYLE = {solver_name: (CMAP(i), MARKERS[i], all_solvers[solver_name])
          for i, solver_name in enumerate(solvers)}
 
-fontsize = 20
-labelsize = 20
+fontsize = 12
+labelsize = 12
 
 
 def filter_data_and_obj(dataset, objective, idx):
