@@ -8,6 +8,10 @@ with safe_import_context() as import_ctx:
     from scipy.sparse.linalg import cg
 
 
+def get_inverse_D(p):
+    return - np.arange(1, p, 1) / p + np.tri(p)[:, 1:]
+
+
 class Solver(BaseSolver):
     """Dual Projected gradient descent for analysis formulation."""
     name = 'Dual PGD analysis'
