@@ -32,30 +32,15 @@ class Solver(BaseSolver):
         LD = 2.0  # Lipschitz constant associated to D (only for 1d!!)
         LA = get_l2norm(self.A)
         sigma_v = 1.0 / (self.ratio * LD)
-        sigma_w = 1.0 / (self.ratio * LA)
         tau = 1 / (LA ** 2 / 2 + sigma_v * LD ** 2)
         eta = self.eta
         # initialisation
         u = self.c * np.ones(p)
         v = np.zeros(p - 1)
-        w = self.A @ u
 
         while callback(u):
-            if self.data_fit == 'quad':
-                u_tmp = (u - tau * self.A.T @ (self.A @ u - self.y)
-                         - tau * (-np.diff(v, append=0, prepend=0)))
-            else:
-                u_tmp = (u
-                         - tau * (- np.diff(v, append=0, prepend=0)
-                                  + self.A.T @ w))
-                w_tmp = w + sigma_w * self.A @ (2 * u_tmp - u)
-                R_tmp = sigma_w * self.y - w_tmp
-                w_tmp = (w_tmp
-                         - np.where(abs(R_tmp) < (self.delta * (sigma_w + 1)),
-                                    sigma_w * ((self.y + w_tmp)
-                                               / (sigma_w + 1)),
-                                    w_tmp + (self.delta * np.sign(R_tmp))))
-                w = eta * w_tmp + (1 - eta) * w
+            u_tmp = (u - tau * self.grad(self.A, u)
+                     - tau * (-np.diff(v, append=0, prepend=0)))
             v_tmp = (v + sigma_v * np.diff(2 * u_tmp - u)
                      - sigma_v * self.st(v / sigma_v +
                                          np.diff(2 * u_tmp - u),
@@ -70,3 +55,13 @@ class Solver(BaseSolver):
     def st(self, w, mu):
         w -= np.clip(w, -mu, mu)
         return w
+
+    def grad(self, A, u):
+        R = self.y - A @ u
+        if self.data_fit == 'quad':
+            return - A.T @ R
+        else:
+            return - A.T @ self.grad_huber(R, self.delta)
+
+    def grad_huber(self, R, delta):
+        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
