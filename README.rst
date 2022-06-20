@@ -17,12 +17,12 @@ where n (or n_samples) stands for the number of samples, p (or n_features) stand
 
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
 - $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
-- $\lambda > 0$ is a regularization hyperparameter.
+- $\\lambda > 0$ is a regularization hyperparameter.
 - $F(\\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss $F(y, x) = h_{\\delta} (y - x)$ defined by
 
 
 $$   
-h_{\\delta}(t) = \\left\{ \\begin{aligned} \\frac{1}{2} t^2 & \\textbf{ if } \\vert t \\vert \\le \\delta\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise} \\end{aligned} \\right.
+h_{\\delta}(t) = \\left\{ \\begin{aligned} \\frac{1}{2} t^2 & \\textbf{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise} \\end{aligned} \\right.
 $$
 
 
