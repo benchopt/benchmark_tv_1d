@@ -12,9 +12,6 @@ $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm
 $$G(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\| \\boldsymbol{u} \\|_{TV} = \\lambda \\sum\\limits_{k = 0}^{p-1} | u_{k+1} - u_{k} |$$
 
 
-where n (or n_samples) stands for the number of samples, p (or n_features) stands for the number of features.
-
-
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
 - $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
 - $\\lambda > 0$ is a regularization hyperparameter.
@@ -22,8 +19,12 @@ where n (or n_samples) stands for the number of samples, p (or n_features) stand
 
 
 $$   
-h_{\\delta}(t) = \\left\{ \\begin{aligned} \\frac{1}{2} t^2 & \\textbf{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise} \\end{aligned} \\right.
+h_{\\delta}(t) = \\begin{cases} \\frac{1}{2} t^2 & \\textbf{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise} \\end{cases}
 $$
+
+
+where n (or n_samples) stands for the number of samples, p (or n_features) stands for the number of features.
+
 
 
 Install
