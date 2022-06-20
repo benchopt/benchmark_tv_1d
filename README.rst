@@ -14,17 +14,17 @@ where n (or n_samples) stands for the number of samples, p (or n_features) stand
 
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
 - $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
-- $F(\\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \\tfrac{1}{2} \\|y - x\\|_2^2$, or Huber loss $F(y, x) = h_\\delta (y - x)$ defined by
+- $F(\\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \\frac{1}{2} \\|y - x\\|_2^2$, or Huber loss $F(y, x) = h_{\\delta} (y - x)$ defined by
     
 
 $$   
-   h_\delta (t) = 
-   \left\{
-   \begin{aligned}
-   \frac{1}{2} t^2 & \textbf{ if } \left |t \right | \le \delta\\
-   \delta \left | t \right | - \frac{1}{2} \delta^2 & \textbf{ otherwise}
-   \end{aligned}
-   \right.
+   h_{\\delta} (t) = 
+   \\left\{
+   \\begin{aligned}
+   \\frac{1}{2} t^2 & \textbf{ if } \\left |t \\right | \\le \\delta\\
+   \\delta \\left | t \\right | - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise}
+   \\end{aligned}
+   \\right.
 $$
 
 
