@@ -6,10 +6,10 @@ BenchOpt is a package to simplify and make more transparent and
 reproducible the comparisons of optimization algorithms.
 This benchmark is dedicated to solver of TV-1D regularised regression problem:
 
-$$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}\\^{p}}{\\mathrm{argmin}} F(\\boldsymbol{y}, A \\boldsymbol{u}) + G(D\\boldsymbol{u})$$
+$$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm{argmin}} F(\\boldsymbol{y}, A \\boldsymbol{u}) + G(D\\boldsymbol{u})$$
 
 
-$$G(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\| \\boldsymbol{u} \\|_{TV} = \\lambda \\sum\\limits_{k = 0}^{p-1} \\| u_{k+1} - u_{k} \\|$$
+$$G(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\| \\boldsymbol{u} \\|_{TV} = \\lambda \\sum\\limits_{k = 0}^{p-1} | u_{k+1} - u_{k} |$$
 
 
 where n (or n_samples) stands for the number of samples, p (or n_features) stands for the number of features.
@@ -18,14 +18,15 @@ where n (or n_samples) stands for the number of samples, p (or n_features) stand
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
 - $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
 - $\lambda > 0$ is a regularization hyperparameter.
-- $F(\\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \\frac{1}{2} \\|y - x\\|_2^2$, or Huber loss $F(y, x) = h_{\\delta} (y - x)$ defined by
+- $F(\\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \\frac{1}{2} |y - x|_2^2$, or Huber loss $F(y, x) = h_{\\delta} (y - x)$ defined by
+
 
 $$   
 h_{\\delta}(t) = 
 \\left\{
 \\begin{aligned}
-\\frac{1}{2} t^2 & \textbf{ if } \\left |t \\right | \\le \\delta\\
-\\delta \\left | t \\right | - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise}
+\\frac{1}{2} t^2 & \\textbf{ if } | t | \\le \\delta\\
+\\delta | t | - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise}
 \\end{aligned}
 \\right.
 $$
