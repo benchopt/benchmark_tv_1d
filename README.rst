@@ -6,19 +6,18 @@ BenchOpt is a package to simplify and make more transparent and
 reproducible the comparisons of optimization algorithms.
 This benchmark is dedicated to solver of TV-1D regularised regression problem:
 
-.. math::
+$$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\mathbb{R}^{p}}{\\mathrm{argmin}} F(\\boldsymbol{y}, A \\boldsymbol{u}) + G(\\boldsymbol{u})$$
 
-    \boldsymbol{u} \in \underset{\boldsymbol{u} \mathbb{R}^{p}}{\mathrm{argmin}} F(\boldsymbol{y}, A \boldsymbol{u}) + G(\boldsymbol{u}) \\
-    G(D\boldsymbol{u}) = \lambda \norm{D \boldsymbol{u}}_1 = \lambda \norm{\boldsymbol{u}}_{TV} = \lambda \sum\limits_{k = 0}^{p-1} \left | u_{k+1} - u_{k} \right |
+$$G(D\\boldsymbol{u}) = \\lambda \\norm{D \\boldsymbol{u}}_1 = \\lambda \\norm{\\boldsymbol{u}}_{TV} = \\lambda \\sum\\limits_{k = 0}^{p-1} \\left | u_{k+1} - u_{k} \\right |$$
 
 where n (or n_samples) stands for the number of samples, p (or n_features) stands for the number of features.
 
-- $\boldsymbol{y} \in \mathbb{R}^{n}$ is observation as target vector
-- $A \in \mathbb{R}^{n \times p}$ is a designed operator as an amplifier.
-- $F(\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \tfrac{1}{2} |y - x|_2^2$, or Huber loss $F(y, x) = h_\delta (y - x)$ defined by
+- $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
+- $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
+- $F(\\cdot)$ is a loss function, like quadratic loss, $F(y, x) = \\tfrac{1}{2} \\|y - x\\|_2^2$, or Huber loss $F(y, x) = h_\\delta (y - x)$ defined by
     
-.. math::
-   
+
+$$   
    h_\delta (t) = 
    \left\{
    \begin{aligned}
@@ -26,6 +25,7 @@ where n (or n_samples) stands for the number of samples, p (or n_features) stand
    \delta \left | t \right | - \frac{1}{2} \delta^2 & \textbf{ otherwise}
    \end{aligned}
    \right.
+$$
 
 
 Install
