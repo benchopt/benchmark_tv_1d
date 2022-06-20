@@ -9,7 +9,9 @@ This benchmark is dedicated to solver of TV-1D regularised regression problem:
 $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm{argmin}} F(\\boldsymbol{y}, A \\boldsymbol{u}) + G(D\\boldsymbol{u})$$
 
 
+
 $$G(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\| \\boldsymbol{u} \\|_{TV} = \\lambda \\sum\\limits_{k = 0}^{p-1} | u_{k+1} - u_{k} |$$
+
 
 
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
