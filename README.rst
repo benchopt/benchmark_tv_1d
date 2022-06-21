@@ -19,7 +19,7 @@ $$G(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\| \\
 
 
 $$   
-h_{\\delta}(t) = \\begin{cases} \\frac{1}{2} t^2 & \\textbf{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\textbf{ otherwise} \\end{cases}
+h_{\\delta}(t) = \\begin{cases} \\frac{1}{2} t^2 & \\mathrm{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\mathrm{ otherwise} \\end{cases}
 $$
 
 
