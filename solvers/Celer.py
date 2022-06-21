@@ -61,7 +61,7 @@ class Solver(BaseSolver):
             self.lasso.fit(AL_new, y_new)
             z = self.lasso.coef_.flatten()
         else:
-            z = np.zeros(L.shape[1])
+            z = np.zeros(p-1)
         c = S @ (self.y - AL @ z) / (S @ S)
         self.u = np.r_[0, np.cumsum(z)] + c
 
