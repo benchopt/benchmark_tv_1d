@@ -24,7 +24,7 @@ class Dataset(BaseDataset):
         'random_state': [27]
     }
 
-    # This makes sure that for each solver, we have one siloclated dataset that
+    # This makes sure that for each solver, we have one simulated dataset that
     # will be compatible in the test_solver.
     test_parameters = {
         'type_A': ['random', 'conv'],
