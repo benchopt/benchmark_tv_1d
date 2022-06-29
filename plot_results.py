@@ -33,7 +33,7 @@ PLOT_COLUMN = "objective_value"
 fignames = ["tv1d", "tv1d_norm_x"]
 
 BENCH_FILES = [
-    './outputs/tv1d.csv',
+    './tv1d.csv',
 ]
 FLOATING_PRECISION = 1e-8
 MIN_XLIM = 1e-4
@@ -107,7 +107,7 @@ all_solvers = {
         "PGD(1/L) (S)"
     ),
     'Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=False]': (
-        "PGD(1.9/L) (S)",
+        "PGD(1.9/L) (S)"
     ),
     'Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=True]': "APGD (S)",
     'skglm synthesis': "skglm (S)",
