@@ -17,10 +17,10 @@ class Dataset(BaseDataset):
         'n_samples': [400],
         'n_features': [250],
         'n_blocks': [10],
-        'mu': [0],
-        'sigma': [0.1],
+        'loc, scale': [(0, 0.1)],
         'type_A': ['identity', 'random', 'conv'],
         'type_x': ['block', 'sin'],
+        'type_n': ['gaussian', 'laplace'],
         'random_state': [27]
     }
 
@@ -32,13 +32,13 @@ class Dataset(BaseDataset):
     }
 
     def __init__(self, n_samples=5, n_features=5, n_blocks=1,
-                 mu=0, sigma=0.01, type_A='identity', type_x='block',
-                 random_state=27):
+                 loc=0, scale=0.01, type_A='identity', type_x='block',
+                 type_n='gaussian', random_state=27):
         # Store the parameters of the dataset
         self.n_samples, self.n_features = n_samples, n_features
         self.n_blocks = n_blocks
-        self.mu, self.sigma = mu, sigma
-        self.type_A, self.type_x = type_A, type_x
+        self.loc, self.scale = loc, scale
+        self.type_A, self.type_x, self.type_n = type_A, type_x, type_n
         self.random_state = random_state
 
     def get_A(self, rng):
@@ -73,18 +73,22 @@ class Dataset(BaseDataset):
     def get_data(self):
         rng = np.random.RandomState(self.random_state)
         if self.type_x == 'sin':
-            # A * cos + noise ~ N(mu, sigma)
             t = np.arange(self.n_features)
             x = np.cos(np.pi*t/self.n_features * self.n_blocks)
-        else:
-            # A * blocked signal + noise ~ N(mu, sigma)
+        elif self.type_x == 'block':
             z = sprand(
                 1, self.n_features, density=self.n_blocks/self.n_features,
                 random_state=rng
             ).toarray()[0]
             x = np.cumsum(rng.randn(self.n_features) * z)
+        if self.type_n == 'gaussian':
+            # noise ~ N(loc, scale)
+            n = rng.normal(self.loc, self.scale, self.n_samples)
+        elif self.type_n == 'laplace':
+            # noise ~ L(loc, scale)
+            n = rng.laplace(self.loc, self.scale, self.n_samples)
         A = self.get_A(rng)
-        y = A @ x + rng.normal(self.mu, self.sigma, self.n_samples)
+        y = A @ x + n
         data = dict(A=A, y=y, x=x)
 
         return data
