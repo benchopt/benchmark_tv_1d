@@ -76,17 +76,17 @@ IDX_ROWS = [
 
 IDX_COLUMNS = [
     {
-        ("type_A=conv,type_x=sin", "", ""): (
-            0, "type_A=conv,type_x=sin"
+        ("type_A=conv,type_x=sin, type_n=gaussian", "", ""): (
+            0, "type_A=conv,type_x=sin, type_n=gaussian"
         ),
-        ("type_A=conv,type_x=block", "", ""): (
-            1, "type_A=conv,type_x=block"
+        ("type_A=conv,type_x=block, type_n=gaussian", "", ""): (
+            1, "type_A=conv,type_x=block, type_n=gaussian"
         ),
-        ("type_A=random,type_x=sin", "", ""): (
-            2, "type_A=random,type_x=sin"
+        ("type_A=random,type_x=sin, type_n=gaussian", "", ""): (
+            2, "type_A=random,type_x=sin, type_n=gaussian"
         ),
-        ("type_A=random,type_x=block", "", ""): (
-            3, "type_A=random,type_x=block"
+        ("type_A=random,type_x=block, type_n=gaussian", "", ""): (
+            3, "type_A=random,type_x=block, type_n=gaussian"
         ),
     }
 ] * 2
