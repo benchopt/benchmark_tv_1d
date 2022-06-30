@@ -68,9 +68,7 @@ class Solver(BaseSolver):
                                - gamma * np.diff(np.diff(u),
                                                  append=0, prepend=0)
                                - u_tmp).sum()
-                res = minimize(func, x0=u, method='L-BFGS-B', tol=tol_cg)
-                print(res.success)
-                u = res.x
+                u = minimize(func, x0=u, method='L-BFGS-B', tol=tol_cg).x
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
