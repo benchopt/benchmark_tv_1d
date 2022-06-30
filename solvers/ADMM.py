@@ -7,6 +7,7 @@ with safe_import_context() as import_ctx:
     from scipy.sparse import spdiags
     from scipy.sparse.linalg import LinearOperator
     from scipy.sparse.linalg import cg
+    from scipy.optimize import minimize
 
 
 class Solver(BaseSolver):
@@ -20,11 +21,6 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'gamma': [1.9],
                   'update_pen': [False]}
-
-    def skip(self, A, reg, y, c, delta, data_fit):
-        if data_fit == 'huber':
-            return True, "solver does not work with huber loss"
-        return False, None
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -56,12 +52,25 @@ class Solver(BaseSolver):
                                                         prepend=0))
         while callback(u):
             z_old = z
-            u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
-                     - gamma * np.diff(z, append=0, prepend=0))
-            if isinstance(self.A, np.ndarray):
-                u = np.ravel(AtA_gDtD_inv @ u_tmp)
+            if self.data_fit == 'quad':
+                u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
+                         - gamma * np.diff(z, append=0, prepend=0))
+                if isinstance(self.A, np.ndarray):
+                    u = np.ravel(AtA_gDtD_inv @ u_tmp)
+                else:
+                    u, _ = cg(AtA_gDtD, u_tmp, x0=u, tol=tol_cg)
             else:
-                u, _ = cg(AtA_gDtD, u_tmp, x0=u, tol=tol_cg)
+                u_tmp = (np.diff(mu, append=0, prepend=0)
+                         - gamma * np.diff(z, append=0, prepend=0))
+
+                def func(u):
+                    return abs(self.grad(self.A, u)
+                               - gamma * np.diff(np.diff(u),
+                                                 append=0, prepend=0)
+                               - u_tmp).sum()
+                res = minimize(func, x0=u, method='L-BFGS-B', tol=tol_cg)
+                print(res.success)
+                u = res.x
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
@@ -81,3 +90,13 @@ class Solver(BaseSolver):
     def st(self, w, mu):
         w -= np.clip(w, -mu, mu)
         return w
+
+    def grad(self, A, u):
+        R = self.y - A @ u
+        if self.data_fit == 'quad':
+            return - A.T @ R
+        else:
+            return - A.T @ self.grad_huber(R, self.delta)
+
+    def grad_huber(self, R, delta):
+        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
