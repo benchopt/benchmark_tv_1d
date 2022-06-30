@@ -1,9 +1,7 @@
-My BenchOpt Benchmark
-=====================
+Unidimensional Total variation (TV) Benchmark
+=============================================
 |Build Status| |Python 3.6+|
 
-BenchOpt is a package to simplify and make more transparent and
-reproducible the comparisons of optimization algorithms.
 This benchmark is dedicated to solver of TV-1D regularised regression problem:
 
 $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm{argmin}} F(\\boldsymbol{y}, A \\boldsymbol{u}) + G(D\\boldsymbol{u})$$
