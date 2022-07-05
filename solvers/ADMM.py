@@ -10,6 +10,36 @@ with safe_import_context() as import_ctx:
     from scipy.optimize import minimize
 
 
+def grad_huber(y, A, u, delta):
+    R = y - A @ u
+    return - A.T @ np.where(np.abs(R) < delta, R,
+                            np.sign(R) * delta)
+
+
+def grad_grad_huber(y, A, u, delta):
+    R = y - A @ u
+    n, p = A.shape
+    return (A.T @ (np.identity(n) *
+            np.where(np.abs(R) < delta, 1, 0))
+            @ (A @ np.identity(p)))
+
+
+def grad_L_huber(y, A, u, delta, gDtD, u_tmp):
+    return grad_huber(y, A, u, delta) + gDtD @ u - u_tmp
+
+
+def sum_grad_L_huber(y, A, u, delta, gDtD, u_tmp):
+    f = grad_L_huber(y, A, u, delta, gDtD, u_tmp)
+    return abs(f).sum()
+
+
+def jac_sum_grad_L_huber(y, A, u, delta, gDtD, u_tmp):
+    f = grad_L_huber(y, A, u, delta, gDtD, u_tmp)
+    sgn_f = np.sign(f)
+    return (grad_grad_huber(y, A, u, delta) @ sgn_f
+            + gDtD @ sgn_f)
+
+
 class Solver(BaseSolver):
     """Alternating direction method for analysis formulation."""
     name = 'ADMM analysis'
@@ -41,15 +71,18 @@ class Solver(BaseSolver):
             data = np.array([-np.ones(p), np.ones(p)])
             diags = np.array([0, 1])
             D = spdiags(data, diags, p-1, p)
-            AtA_gDtD_inv = np.linalg.pinv(self.A.T @ self.A + gamma * D.T @ D)
+            gDtD = gamma * D.T @ D
+            AtA_gDtD_inv = np.linalg.pinv(self.A.T @ self.A + gDtD)
         else:
             # D @ x = np.diff(x)
             # D.T @ x = -np.diff(x, append=0, prepend=0)
+            gDtD = LinearOperator(shape=(p, p),
+                                  matvec=lambda x: - gamma * np.diff(
+                                  np.diff(x), append=0, prepend=0))
             AtA_gDtD = LinearOperator(shape=(p, p),
-                                      matvec=lambda x: self.A.T @ (self.A @ x)
-                                      - gamma * np.diff(np.diff(x),
-                                                        append=0,
-                                                        prepend=0))
+                                      matvec=lambda x: self.A.T @ (
+                self.A @ x) + gDtD @ x)
+
         while callback(u):
             z_old = z
             if self.data_fit == 'quad':
@@ -64,11 +97,16 @@ class Solver(BaseSolver):
                          - gamma * np.diff(z, append=0, prepend=0))
 
                 def func(u):
-                    return abs(self.grad(self.A, u)
-                               - gamma * np.diff(np.diff(u),
-                                                 append=0, prepend=0)
-                               - u_tmp).sum()
-                u = minimize(func, x0=u, method='L-BFGS-B', tol=tol_cg).x
+                    return sum_grad_L_huber(self.y, self.A, u,
+                                            self.delta, gDtD, u_tmp)
+
+                def jac(u):
+                    return jac_sum_grad_L_huber(self.y, self.A, u,
+                                                self.delta, gDtD, u_tmp)
+
+                u = minimize(func, x0=u, jac=jac,
+                             method='L-BFGS-B', tol=1e-15).x
+
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
@@ -88,13 +126,3 @@ class Solver(BaseSolver):
     def st(self, w, mu):
         w -= np.clip(w, -mu, mu)
         return w
-
-    def grad(self, A, u):
-        R = self.y - A @ u
-        if self.data_fit == 'quad':
-            return - A.T @ R
-        else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
