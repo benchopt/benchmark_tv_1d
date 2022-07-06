@@ -7,6 +7,32 @@ with safe_import_context() as import_ctx:
     from scipy.sparse import spdiags
     from scipy.sparse.linalg import LinearOperator
     from scipy.sparse.linalg import cg
+    from scipy.optimize import minimize
+
+
+def huber(R, delta):
+    norm_1 = np.abs(R)
+    loss = np.where(norm_1 < delta,
+                    0.5 * norm_1**2,
+                    delta * norm_1 - 0.5 * delta**2)
+    return np.sum(loss)
+
+
+def grad_huber(R, delta):
+    return np.where(np.abs(R) < delta, R,
+                    np.sign(R) * delta)
+
+
+def loss(y, A, u, delta, z, mu, gamma):
+    R = y - A @ u
+    return huber(R, delta) + gamma / 2 * np.linalg.norm(
+        np.diff(u) - z + mu / gamma, ord=2) ** 2
+
+
+def jac_loss(y, A, u, delta, z, mu, gamma):
+    R = y - A @ u
+    return - A.T @ grad_huber(R, delta) - gamma * np.diff(
+        np.diff(u) - z + mu / gamma, append=0, prepend=0)
 
 
 class Solver(BaseSolver):
@@ -20,11 +46,6 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'gamma': [1.9],
                   'update_pen': [False]}
-
-    def skip(self, A, reg, y, c, delta, data_fit):
-        if data_fit == 'huber':
-            return True, "solver does not work with huber loss"
-        return False, None
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -50,18 +71,31 @@ class Solver(BaseSolver):
             # D @ x = np.diff(x)
             # D.T @ x = -np.diff(x, append=0, prepend=0)
             AtA_gDtD = LinearOperator(shape=(p, p),
-                                      matvec=lambda x: self.A.T @ (self.A @ x)
-                                      - gamma * np.diff(np.diff(x),
-                                                        append=0,
-                                                        prepend=0))
+                                      matvec=lambda x: self.A.T @ (
+                self.A @ x) - gamma * np.diff(
+                np.diff(x), append=0, prepend=0))
+
         while callback(u):
             z_old = z
-            u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
-                     - gamma * np.diff(z, append=0, prepend=0))
-            if isinstance(self.A, np.ndarray):
-                u = np.ravel(AtA_gDtD_inv @ u_tmp)
+            if self.data_fit == 'quad':
+                u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
+                         - gamma * np.diff(z, append=0, prepend=0))
+                if isinstance(self.A, np.ndarray):
+                    u = np.ravel(AtA_gDtD_inv @ u_tmp)
+                else:
+                    u, _ = cg(AtA_gDtD, u_tmp, x0=u, tol=tol_cg)
             else:
-                u, _ = cg(AtA_gDtD, u_tmp, x0=u, tol=tol_cg)
+                def func(u):
+                    return loss(self.y, self.A, u,
+                                self.delta, z, mu, gamma)
+
+                def jac(u):
+                    return jac_loss(self.y, self.A, u,
+                                    self.delta, z, mu, gamma)
+
+                u = minimize(func, x0=u, jac=jac,
+                             method='BFGS', tol=1e-15).x
+
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
