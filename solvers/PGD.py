@@ -6,6 +6,7 @@ with safe_import_context() as import_ctx:
     import numpy as np
     import prox_tv as ptv
     get_l2norm = import_ctx.import_from('shared', 'get_l2norm')
+    grad_huber = import_ctx.import_from('shared', 'grad_huber')
 
 
 class Solver(BaseSolver):
@@ -63,7 +64,4 @@ class Solver(BaseSolver):
         if self.data_fit == 'quad':
             return - A.T @ R
         else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
+            return - A.T @ grad_huber(R, self.delta)

@@ -5,6 +5,8 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     get_l2norm = import_ctx.import_from('shared', 'get_l2norm')
+    st = import_ctx.import_from('shared', 'st')
+    grad_huber = import_ctx.import_from('shared', 'grad_huber')
 
 
 class Solver(BaseSolver):
@@ -42,9 +44,9 @@ class Solver(BaseSolver):
             u_tmp = (u - tau * self.grad(self.A, u)
                      - tau * (-np.diff(v, append=0, prepend=0)))
             v_tmp = (v + sigma_v * np.diff(2 * u_tmp - u)
-                     - sigma_v * self.st(v / sigma_v +
-                                         np.diff(2 * u_tmp - u),
-                                         self.reg / sigma_v))
+                     - sigma_v * st(v / sigma_v +
+                                    np.diff(2 * u_tmp - u),
+                                    self.reg / sigma_v))
             u = eta * u_tmp + (1 - eta) * u
             v = eta * v_tmp + (1 - eta) * v
         self.u = u
@@ -52,16 +54,9 @@ class Solver(BaseSolver):
     def get_result(self):
         return self.u
 
-    def st(self, w, mu):
-        w -= np.clip(w, -mu, mu)
-        return w
-
     def grad(self, A, u):
         R = self.y - A @ u
         if self.data_fit == 'quad':
             return - A.T @ R
         else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
+            return - A.T @ grad_huber(R, self.delta)

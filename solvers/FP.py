@@ -4,6 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    prox_z = import_ctx.import_from('shared', 'prox_z')
+    grad_huber = import_ctx.import_from('shared', 'grad_huber')
 
 
 class Solver(BaseSolver):
@@ -38,24 +40,15 @@ class Solver(BaseSolver):
         while callback(np.cumsum(z)):
             mu = z - stepsize * (n * self.grad(AL, z) * AL.T).T
             nu = np.mean(mu, axis=0)
-            z = self.st(nu, stepsize * self.reg)
+            z = prox_z(nu, stepsize * self.reg)
         self.u = np.cumsum(z)
 
     def get_result(self):
         return self.u
-
-    def st(self, w, mu):
-        w0 = w[0]
-        w -= np.clip(w, -mu, mu)
-        w[0] = w0
-        return w
 
     def grad(self, A, u):
         R = self.y - A @ u
         if self.data_fit == 'quad':
             return - R
         else:
-            return - self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
+            return - grad_huber(R, self.delta)

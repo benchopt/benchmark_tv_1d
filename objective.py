@@ -4,6 +4,8 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy import optimize
+    huber = import_ctx.import_from('shared', 'huber')
+    grad_huber = import_ctx.import_from('shared', 'grad_huber')
 
 
 class Objective(BaseObjective):
@@ -24,13 +26,12 @@ class Objective(BaseObjective):
         R = self.y - self.A @ u
         reg_TV = abs(np.diff(u)).sum()
         if self.data_fit == 'quad':
-            loss = .5 * R @ R + self.reg_scaled * reg_TV
-        else:
-            loss = self.huber(R, self.delta) + self.reg_scaled * reg_TV
-
+            loss = .5 * R @ R
+        elif self.data_fit == 'huber':
+            loss = huber(R, self.delta)
         norm_x = np.linalg.norm(u - self.x)
 
-        return dict(value=loss, norm_x=norm_x)
+        return dict(value=loss + self.reg_scaled * reg_TV, norm_x=norm_x)
 
     def get_one_solution(self):
         return np.zeros(self.A.shape[1])
@@ -38,13 +39,6 @@ class Objective(BaseObjective):
     def to_dict(self):
         return dict(A=self.A, reg=self.reg_scaled, y=self.y, c=self.c,
                     delta=self.delta, data_fit=self.data_fit)
-
-    def huber(self, R, delta):
-        norm_1 = np.abs(R)
-        loss = np.where(norm_1 < delta,
-                        0.5 * norm_1**2,
-                        delta * norm_1 - 0.5 * delta**2)
-        return np.sum(loss)
 
     def get_c(self, S, delta):
         if self.data_fit == 'quad':
@@ -55,7 +49,7 @@ class Objective(BaseObjective):
     def c_huber(self, S, delta):
         def f(c):
             R = self.y - S * c
-            return abs((S * self.grad_huber(R, delta)).sum())
+            return abs((S * grad_huber(R, delta)).sum())
         yS = self.y / S
         return optimize.golden(f, brack=(min(yS), max(yS)))
 
@@ -71,7 +65,4 @@ class Objective(BaseObjective):
         if self.data_fit == 'quad':
             return - A.T @ R
         else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
+            return - A.T @ grad_huber(R, self.delta)

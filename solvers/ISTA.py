@@ -3,6 +3,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
+    prox_z = import_ctx.import_from('shared', 'prox_z')
+    grad_huber = import_ctx.import_from('shared', 'grad_huber')
 
 
 class Solver(BaseSolver):
@@ -46,8 +48,8 @@ class Solver(BaseSolver):
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
                 z_old[:] = z
                 z[:] = z_acc
-            z = self.st(z - stepsize * self.grad(AL, z),
-                        self.reg * stepsize)
+            z = prox_z(z - stepsize * self.grad(AL, z),
+                       self.reg * stepsize)
             if self.use_acceleration:
                 z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
         self.u = np.cumsum(z)
@@ -55,18 +57,9 @@ class Solver(BaseSolver):
     def get_result(self):
         return self.u
 
-    def st(self, w, mu):
-        w0 = w[0]
-        w -= np.clip(w, -mu, mu)
-        w[0] = w0
-        return w
-
     def grad(self, A, u):
         R = self.y - A @ u
         if self.data_fit == 'quad':
             return - A.T @ R
         else:
-            return - A.T @ self.grad_huber(R, self.delta)
-
-    def grad_huber(self, R, delta):
-        return np.where(np.abs(R) < delta, R, np.sign(R) * delta)
+            return - A.T @ grad_huber(R, self.delta)
