@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
-from solvers.ADMM import sum_grad_L_huber
-from solvers.ADMM import jac_sum_grad_L_huber
+from solvers.ADMM import loss
+from solvers.ADMM import jac_loss
 from scipy.optimize import check_grad as check_grad
 
 
@@ -26,27 +26,22 @@ def test_grad(random_state):
     z = rng.randn(p - 1)
     mu = rng.randn(p - 1)
     gamma = 1.9
-    u_tmp = (np.diff(mu, append=0, prepend=0)
-             - gamma * np.diff(z, append=0, prepend=0))
-    gDtD = LinearOperator(shape=(p, p),
-                          matvec=lambda x: - gamma * np.diff(
-                          np.diff(x), append=0, prepend=0))
 
     def func(u):
-        return sum_grad_L_huber(y, A, u, delta, gDtD, u_tmp)
+        return loss(y, A, u, delta, z, mu, gamma)
 
     def jac(u):
-        return jac_sum_grad_L_huber(y, A, u, delta, gDtD, u_tmp)
+        return jac_loss(y, A, u, delta, z, mu, gamma)
 
     def func_op(u):
-        return sum_grad_L_huber(y, A_op, u, delta, gDtD, u_tmp)
+        return loss(y, A_op, u, delta, z, mu, gamma)
 
     def jac_op(u):
-        return jac_sum_grad_L_huber(y, A_op, u, delta, gDtD, u_tmp)
+        return jac_loss(y, A_op, u, delta, z, mu, gamma)
 
-    np.testing.assert_almost_equal(0,
-                                   check_grad(func, jac, x0=np.zeros(p)),
-                                   decimal=6)
-    np.testing.assert_almost_equal(0,
-                                   check_grad(func_op, jac_op, x0=np.zeros(p)),
-                                   decimal=6)
+    np.testing.assert_almost_equal(0, check_grad(func, jac,
+                                                 x0=rng.randn(p)),
+                                   decimal=5)
+    np.testing.assert_almost_equal(0, check_grad(func_op, jac_op,
+                                                 x0=rng.randn(p)),
+                                   decimal=5)

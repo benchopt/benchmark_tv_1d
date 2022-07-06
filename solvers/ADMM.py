@@ -10,34 +10,29 @@ with safe_import_context() as import_ctx:
     from scipy.optimize import minimize
 
 
-def grad_huber(y, A, u, delta):
+def huber(R, delta):
+    norm_1 = np.abs(R)
+    loss = np.where(norm_1 < delta,
+                    0.5 * norm_1**2,
+                    delta * norm_1 - 0.5 * delta**2)
+    return np.sum(loss)
+
+
+def grad_huber(R, delta):
+    return np.where(np.abs(R) < delta, R,
+                    np.sign(R) * delta)
+
+
+def loss(y, A, u, delta, z, mu, gamma):
     R = y - A @ u
-    return - A.T @ np.where(np.abs(R) < delta, R,
-                            np.sign(R) * delta)
+    return huber(R, delta) + gamma / 2 * np.linalg.norm(
+        np.diff(u) - z + mu / gamma, ord=2) ** 2
 
 
-def grad_grad_huber(y, A, u, delta):
+def jac_loss(y, A, u, delta, z, mu, gamma):
     R = y - A @ u
-    n, p = A.shape
-    return (A.T @ (np.identity(n) *
-            np.where(np.abs(R) < delta, 1, 0))
-            @ (A @ np.identity(p)))
-
-
-def grad_L_huber(y, A, u, delta, gDtD, u_tmp):
-    return grad_huber(y, A, u, delta) + gDtD @ u - u_tmp
-
-
-def sum_grad_L_huber(y, A, u, delta, gDtD, u_tmp):
-    f = grad_L_huber(y, A, u, delta, gDtD, u_tmp)
-    return abs(f).sum()
-
-
-def jac_sum_grad_L_huber(y, A, u, delta, gDtD, u_tmp):
-    f = grad_L_huber(y, A, u, delta, gDtD, u_tmp)
-    sgn_f = np.sign(f)
-    return (grad_grad_huber(y, A, u, delta) @ sgn_f
-            + gDtD @ sgn_f)
+    return - A.T @ grad_huber(R, delta) - gamma * np.diff(
+        np.diff(u) - z + mu / gamma, append=0, prepend=0)
 
 
 class Solver(BaseSolver):
@@ -71,17 +66,14 @@ class Solver(BaseSolver):
             data = np.array([-np.ones(p), np.ones(p)])
             diags = np.array([0, 1])
             D = spdiags(data, diags, p-1, p)
-            gDtD = gamma * D.T @ D
-            AtA_gDtD_inv = np.linalg.pinv(self.A.T @ self.A + gDtD)
+            AtA_gDtD_inv = np.linalg.pinv(self.A.T @ self.A + gamma * D.T @ D)
         else:
             # D @ x = np.diff(x)
             # D.T @ x = -np.diff(x, append=0, prepend=0)
-            gDtD = LinearOperator(shape=(p, p),
-                                  matvec=lambda x: - gamma * np.diff(
-                                  np.diff(x), append=0, prepend=0))
             AtA_gDtD = LinearOperator(shape=(p, p),
                                       matvec=lambda x: self.A.T @ (
-                self.A @ x) + gDtD @ x)
+                self.A @ x) - gamma * np.diff(
+                np.diff(x), append=0, prepend=0))
 
         while callback(u):
             z_old = z
@@ -93,19 +85,16 @@ class Solver(BaseSolver):
                 else:
                     u, _ = cg(AtA_gDtD, u_tmp, x0=u, tol=tol_cg)
             else:
-                u_tmp = (np.diff(mu, append=0, prepend=0)
-                         - gamma * np.diff(z, append=0, prepend=0))
-
                 def func(u):
-                    return sum_grad_L_huber(self.y, self.A, u,
-                                            self.delta, gDtD, u_tmp)
+                    return loss(self.y, self.A, u,
+                                self.delta, z, mu, gamma)
 
                 def jac(u):
-                    return jac_sum_grad_L_huber(self.y, self.A, u,
-                                                self.delta, gDtD, u_tmp)
+                    return jac_loss(self.y, self.A, u,
+                                    self.delta, z, mu, gamma)
 
                 u = minimize(func, x0=u, jac=jac,
-                             method='L-BFGS-B', tol=1e-15).x
+                             method='BFGS', tol=1e-15).x
 
             z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
