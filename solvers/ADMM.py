@@ -8,19 +8,9 @@ with safe_import_context() as import_ctx:
     from scipy.sparse.linalg import LinearOperator
     from scipy.sparse.linalg import cg
     from scipy.optimize import minimize
-
-
-def huber(R, delta):
-    norm_1 = np.abs(R)
-    loss = np.where(norm_1 < delta,
-                    0.5 * norm_1**2,
-                    delta * norm_1 - 0.5 * delta**2)
-    return np.sum(loss)
-
-
-def grad_huber(R, delta):
-    return np.where(np.abs(R) < delta, R,
-                    np.sign(R) * delta)
+    st = import_ctx.import_from('shared', 'st')
+    huber = import_ctx.import_from('shared', 'huber')
+    grad_huber = import_ctx.import_from('shared', 'grad_huber')
 
 
 def loss(y, A, u, delta, z, mu, gamma):
@@ -96,7 +86,7 @@ class Solver(BaseSolver):
                 u = minimize(func, x0=u, jac=jac,
                              method='BFGS', tol=1e-15).x
 
-            z = self.st(np.diff(u) + mu / gamma, self.reg / gamma)
+            z = st(np.diff(u) + mu / gamma, self.reg / gamma)
             mu += gamma * (np.diff(u) - z)
 
             if self.update_pen:
@@ -111,7 +101,3 @@ class Solver(BaseSolver):
 
     def get_result(self):
         return self.u
-
-    def st(self, w, mu):
-        w -= np.clip(w, -mu, mu)
-        return w
