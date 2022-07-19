@@ -17,7 +17,8 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'alpha': [1.9]}
+    parameters = {'alpha': [1.9],
+                  'use_acceleration': [False, True]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -37,10 +38,22 @@ class Solver(BaseSolver):
         z[0] = self.c
         mu = np.zeros((p, p))
         nu = np.zeros(p)
+
+        z_old = z.copy()
+        z_acc = z.copy()
+
+        t_new = 1
         while callback(np.cumsum(z)):
+            if self.use_acceleration:
+                t_old = t_new
+                t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
+                z_old[:] = z
+                z[:] = z_acc
             mu = z - stepsize * (n * self.grad(AL, z) * AL.T).T
             nu = np.mean(mu, axis=0)
             z = prox_z(nu, stepsize * self.reg)
+            if self.use_acceleration:
+                z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
         self.u = np.cumsum(z)
 
     def get_result(self):
