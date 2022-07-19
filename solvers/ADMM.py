@@ -34,7 +34,7 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'gamma': [1.9],
+    parameters = {'gamma': [25.],
                   'update_pen': [False]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
