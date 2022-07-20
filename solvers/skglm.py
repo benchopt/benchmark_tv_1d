@@ -23,7 +23,9 @@ class Solver(BaseSolver):
     )
 
     install_cmd = 'conda'
-    requirements = ["pip:git+https://github.com/EnLAI111/skglm@Huber_datafit"]
+    requirements = (
+        ["pip:git+https://github.com/scikit-learn-contrib/skglm.git"]
+    )
     references = [
         'M. Massias, P. Bannier, Q. Klopfenstein and Q. Bertrand.'
         '"skglm: Fast and modular Generalized Linear Models'
