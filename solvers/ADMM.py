@@ -1,6 +1,10 @@
 from benchopt import BaseSolver
 from benchopt.stopping_criterion import SufficientDescentCriterion
 from benchopt import safe_import_context
+from benchopt.utils.safe_import import set_benchmark
+
+# this means this test has to be run from the root
+set_benchmark('.')
 
 with safe_import_context() as import_ctx:
     import numpy as np
