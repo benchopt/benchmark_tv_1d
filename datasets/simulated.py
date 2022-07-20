@@ -28,8 +28,7 @@ class Dataset(BaseDataset):
     # will be compatible in the test_solver.
     test_parameters = {
         'type_A': ['random', 'conv'],
-        'n_samples, n_features': [(10, 5)],
-        'type_n': ['gaussian']
+        'n_samples, n_features': [(10, 5)]
     }
 
     def __init__(self, n_samples=5, n_features=5, n_blocks=1,
