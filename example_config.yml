@@ -1,18 +1,22 @@
 objective:
-  - TV1D[data_fit=quad,delta=0,reg=0.1]
-  - TV1D[data_fit=huber,delta=0.9,reg=0.1]
+  - TV1D[data_fit=quad,delta=0,reg=[0.1,0.5]]
+  - TV1D[data_fit=huber,delta=0.9,reg=[0.1,0.5]]
 dataset:
-  - Simulated[n_samples=40,n_features=25,type_A=conv,type_x=block,type_n=laplace]
-  - Simulated[n_samples=40,n_features=40,type_A=random,type_x=block,type_n=gaussian]
+  - Simulated[n_samples=40,n_features=25,type_A=conv,type_x=[sin,block],type_n=[gaussian,laplace]]
+  - Simulated[n_samples=40,n_features=40,type_A=random,type_x=[sin,block],type_n=[gaussian,laplace]]
 solver:
-  - admm analysis
-  - celer synthesis
-  - Chambolle-Pock PD-split analysis
-  - CondatVu analysis
-  - Dual PGD analysis
-  - FP synthesis
-  - Primal PGD synthesis*
-  - Primal PGD analysis
+  - ADMM analysis[gamma=25.0,update_pen=False]
+  - Celer synthesis
+  - Chambolle-Pock PD-split analysis[ratio=1.0,theta=1.0]
+  - CondatVu analysis[eta=1.0,ratio=1.0]
+  - Dual PGD analysis[alpha=1.0,use_acceleration=False]
+  - Dual PGD analysis[alpha=1.0,use_acceleration=True]
+  - FP synthesis[alpha=1.9,use_acceleration=False]
+  - FP synthesis[alpha=1.9,use_acceleration=True]
+  - Primal PGD analysis[alpha=1.0,use_acceleration=False]
+  - Primal PGD analysis[alpha=1.0,use_acceleration=True]
+  - Primal PGD synthesis*[alpha=1.0,use_acceleration=True]
+  - Primal PGD synthesis*[alpha=1.9,use_acceleration=False]
   - skglm synthesis
 n-repetitions: 1
 timeout: 60
