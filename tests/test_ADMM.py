@@ -8,11 +8,7 @@ from benchopt.utils.safe_import import set_benchmark
 # this means this test has to be run from the root
 set_benchmark('./')
 
-try:
-    from solvers.ADMM import loss
-    from solvers.ADMM import jac_loss
-except Exception:
-    raise
+from solvers.ADMM import loss, jac_loss  # noqa: E402
 
 
 @pytest.mark.parametrize('random_state', [0, 27, 42, 66])
