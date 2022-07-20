@@ -33,7 +33,7 @@ PLOT_COLUMN = "objective_value"
 fignames = ["tv1d", "tv1d_norm_x"]
 
 BENCH_FILES = [
-    './tv1d.csv',
+    './outputs/benchopt_run_2022-07-20_15h32m30.csv',
 ]
 FLOATING_PRECISION = 1e-8
 MIN_XLIM = 1e-4
@@ -76,23 +76,23 @@ IDX_ROWS = [
 
 IDX_COLUMNS = [
     {
-        ("type_A=conv,type_x=sin, type_n=gaussian", "", ""): (
-            0, "type_A=conv,type_x=sin, type_n=gaussian"
+        ("type_A=conv,type_n=gaussian,type_x=sin", "", ""): (
+            0, "type_A=conv,type_x=sin"
         ),
-        ("type_A=conv,type_x=block, type_n=gaussian", "", ""): (
-            1, "type_A=conv,type_x=block, type_n=gaussian"
+        ("type_A=conv,type_n=gaussian,type_x=block", "", ""): (
+            1, "type_A=conv,type_x=block"
         ),
-        ("type_A=random,type_x=sin, type_n=gaussian", "", ""): (
-            2, "type_A=random,type_x=sin, type_n=gaussian"
+        ("type_A=random,type_n=gaussian,type_x=sin", "", ""): (
+            2, "type_A=random,type_x=sin"
         ),
-        ("type_A=random,type_x=block, type_n=gaussian", "", ""): (
-            3, "type_A=random,type_x=block, type_n=gaussian"
+        ("type_A=random,type_n=gaussian,type_x=block", "", ""): (
+            3, "type_A=random,type_x=block"
         ),
     }
 ] * 2
 
 all_solvers = {
-    'ADMM analysis[gamma=1.9,update_pen=False]': "ADMM (A)",
+    'ADMM analysis[gamma=25.0,update_pen=False]': "ADMM (A)",
     'Primal PGD analysis[alpha=1.0,use_acceleration=False]': "PGD (A)",
     'Primal PGD analysis[alpha=1.0,use_acceleration=True]': "APGD (A)",
     'Chambolle-Pock PD-split analysis[ratio=1.0,theta=1.0]': (
@@ -102,14 +102,14 @@ all_solvers = {
     'Dual PGD analysis[alpha=1.0,use_acceleration=False]': "Dual PGD (A)",
     'Dual PGD analysis[alpha=1.0,use_acceleration=True]': "Dual APGD (A)",
     'Celer synthesis': "celer (S)",
-    'FP synthesis[alpha=1.9]': "FP (S)",
-    'Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=False]': (
-        "PGD(1/L) (S)"
-    ),
+    'FP synthesis[alpha=1.9,use_acceleration=False]': "FP (S)",
+    'FP synthesis[alpha=1.9,use_acceleration=True]': "FP (S)",
     'Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=False]': (
         "PGD(1.9/L) (S)"
     ),
-    'Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=True]': "APGD (S)",
+    'Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=True]': (
+        "APGD(1/L) (S)"
+    ),
     'skglm synthesis': "skglm (S)",
 }
 
@@ -172,7 +172,6 @@ for figname, idx_rows, idx_cols in zip(fignames, IDX_ROWS, IDX_COLUMNS):
                 else:
                     c_star = 0
                 for i, solver_name in enumerate(all_solvers):
-
                     # Get style if it exists or create a new one
                     color, marker, label = STYLE.get(solver_name)
 
