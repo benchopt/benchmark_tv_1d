@@ -1,9 +1,18 @@
 import pytest
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
-from solvers.ADMM import loss
-from solvers.ADMM import jac_loss
 from scipy.optimize import check_grad as check_grad
+
+from benchopt.utils.safe_import import set_benchmark
+
+# this means this test has to be run from the root
+set_benchmark('./')
+
+try:
+    from solvers.ADMM import loss
+    from solvers.ADMM import jac_loss
+except Exception:
+    raise
 
 
 @pytest.mark.parametrize('random_state', [0, 27, 42, 66])
