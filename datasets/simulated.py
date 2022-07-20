@@ -17,7 +17,8 @@ class Dataset(BaseDataset):
         'n_samples': [400],
         'n_features': [250],
         'n_blocks': [10],
-        'loc, scale': [(0, 0.1)],
+        'loc': [0.],
+        'scale': [0.1],
         'type_A': ['identity', 'random', 'conv'],
         'type_x': ['block', 'sin'],
         'type_n': ['gaussian', 'laplace'],
@@ -53,7 +54,7 @@ class Dataset(BaseDataset):
             )
         elif self.type_A == 'random':
             A = rng.randn(self.n_samples, self.n_features)
-        elif self.type_A == 'conv':
+        else:
             len_A = self.n_samples - self.n_features + 1
             filt = rng.randn(len_A)
             A = LinearOperator(
@@ -75,7 +76,7 @@ class Dataset(BaseDataset):
         if self.type_x == 'sin':
             t = np.arange(self.n_features)
             x = np.cos(np.pi*t/self.n_features * self.n_blocks)
-        elif self.type_x == 'block':
+        else:
             z = sprand(
                 1, self.n_features, density=self.n_blocks/self.n_features,
                 random_state=rng
@@ -84,7 +85,7 @@ class Dataset(BaseDataset):
         if self.type_n == 'gaussian':
             # noise ~ N(loc, scale)
             n = rng.normal(self.loc, self.scale, self.n_samples)
-        elif self.type_n == 'laplace':
+        else:
             # noise ~ L(loc, scale)
             n = rng.laplace(self.loc, self.scale, self.n_samples)
         A = self.get_A(rng)
