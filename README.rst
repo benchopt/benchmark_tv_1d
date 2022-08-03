@@ -7,8 +7,8 @@ This benchmark is dedicated to solver of TV-1D regularised regression problem:
 $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm{argmin}} f(\\boldsymbol{y}, A \\boldsymbol{u}) + g(D\\boldsymbol{u})$$
 
 
-- $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
-- $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
+- $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is a vector of observations or targets.
+- $A \\in \\mathbb{R}^{n \\times p}$ is a design matrix or forward operator.
 - $\\lambda > 0$ is a regularization hyperparameter.
 - $f(\\boldsymbol{y}, A\\boldsymbol{u}) = \\sum\\limits_{k} l(y_{k}, (A\\boldsymbol{u})_{k})$ is a loss function, where $l$ can be quadratic loss as $l(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss as $l(y, x) = h_{\\delta} (y - x)$ defined by
 
@@ -23,7 +23,7 @@ $$
 $$g(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\sum\\limits_{k = 1}^{p-1} \\vert u_{k+1} - u_{k} \\vert $$
 
 
-where n (or n_samples) stands for the number of samples, p (or n_features) stands for the number of features.
+where n (or `n_samples`) stands for the number of samples, p (or `n_features`) stands for the number of features.
 
 
 
