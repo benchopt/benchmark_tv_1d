@@ -17,7 +17,7 @@ $$
 h_{\\delta}(t) = \\begin{cases} \\frac{1}{2} t^2 & \\mathrm{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\mathrm{ otherwise} \\end{cases}
 $$
 
-- $D \\in \\mathbb{R}^{(p-1) \\times p}$ is a finite difference operator, such that the regularised TV-1D term $g(\\boldsymbol{u}) = \\lambda \\| \\boldsymbol{u} \\|_{TV}$ expressed as follows.
+- $D \\in \\mathbb{R}^{(p-1) \\times p}$ is a finite difference operator, such that the regularised TV-1D term $g(D\\boldsymbol{u}) = \\lambda \\| \\boldsymbol{u} \\|_{TV}$ expressed as follows.
 
 
 $$g(D\\boldsymbol{u}) = \\lambda \\| D \\boldsymbol{u} \\|_{1} = \\lambda \\sum\\limits_{k = 1}^{p-1} \\vert u_{k+1} - u_{k} \\vert $$
