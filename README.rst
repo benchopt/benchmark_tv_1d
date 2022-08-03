@@ -10,7 +10,7 @@ $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is observation as target vector
 - $A \\in \\mathbb{R}^{n \\times p}$ is a designed operator as an amplifier.
 - $\\lambda > 0$ is a regularization hyperparameter.
-- $f(\\boldsymbol{y}, A\\boldsymbol{u}) = \\sum\\limits_{k} l(y_{k}, (A\boldsymbol{u})_{k})$ is a loss function, where $l$ can be quadratic loss as $l(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss as $l(y, x) = h_{\\delta} (y - x)$ defined by
+- $f(\\boldsymbol{y}, A\\boldsymbol{u}) = \\sum\\limits_{k} l(y_{k}, (A\\boldsymbol{u})_{k})$ is a loss function, where $l$ can be quadratic loss as $l(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss as $l(y, x) = h_{\\delta} (y - x)$ defined by
 
 
 $$   
