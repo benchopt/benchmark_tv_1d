@@ -33,7 +33,7 @@ PLOT_COLUMN = "objective_value"
 fignames = ["tv1d", "tv1d_norm_x"]
 
 BENCH_FILES = [
-    './outputs/benchopt_run_2022-07-20_15h32m30.csv',
+    './tv1d.parquet',
 ]
 FLOATING_PRECISION = 1e-8
 MIN_XLIM = 1e-4
@@ -103,7 +103,7 @@ all_solvers = {
     'Dual PGD analysis[alpha=1.0,use_acceleration=True]': "Dual APGD (A)",
     'Celer synthesis': "celer (S)",
     'FP synthesis[alpha=1.9,use_acceleration=False]': "FP (S)",
-    'FP synthesis[alpha=1.9,use_acceleration=True]': "FP (S)",
+    'FP synthesis[alpha=1.9,use_acceleration=True]': "AFP (S)",
     'Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=False]': (
         "PGD(1.9/L) (S)"
     ),
@@ -113,7 +113,7 @@ all_solvers = {
     'skglm synthesis': "skglm (S)",
 }
 
-df = pd.read_csv(BENCH_FILES[0], header=0, index_col=0)
+df = pd.read_parquet(BENCH_FILES[0])
 solvers = df["solver_name"].unique()
 STYLE = {solver_name: (CMAP(i), MARKERS[i], all_solvers[solver_name])
          for i, solver_name in enumerate(solvers)}
@@ -145,7 +145,7 @@ for figname, idx_rows, idx_cols in zip(fignames, IDX_ROWS, IDX_COLUMNS):
     )
 
     for bench_file in BENCH_FILES:
-        df = pd.read_csv(bench_file, header=0, index_col=0)
+        df = pd.read_parquet(bench_file)
         datasets = df["data_name"].unique()
         objectives = df["objective_name"].unique()
         solvers = df["solver_name"].unique()
