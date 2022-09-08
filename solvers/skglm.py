@@ -47,7 +47,6 @@ class Solver(BaseSolver):
             self.clf = GeneralizedLinearEstimator(
                 Quadratic(),
                 WeightedL1(self.reg / self.A.shape[0], weights),
-                is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-16, fit_intercept=False,
                 warm_start=False, verbose=False,
@@ -56,7 +55,6 @@ class Solver(BaseSolver):
             self.clf = GeneralizedLinearEstimator(
                 Huber(self.delta),
                 WeightedL1(self.reg / self.A.shape[0], weights),
-                is_classif=False,
                 max_iter=1, max_epochs=100000,
                 tol=1e-16, fit_intercept=False,
                 warm_start=False, verbose=False,
