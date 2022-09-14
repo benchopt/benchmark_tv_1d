@@ -8,6 +8,7 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 with safe_import_context() as import_ctx:
     import numpy as np
     from skglm import GeneralizedLinearEstimator
+    from skglm.solvers import AndersonCD
     from skglm.datafits import Quadratic
     from skglm.datafits import Huber
     from skglm.penalties import WeightedL1
@@ -43,21 +44,21 @@ class Solver(BaseSolver):
         weights = np.ones(self.A.shape[1])
         weights[0] = 0
 
+        solver = AndersonCD(
+            max_iter=1, max_epochs=100_00, tol=1e-12, fit_intercept=False,
+            warm_start=False, verbose=False)
+
         if data_fit == 'quad':
             self.clf = GeneralizedLinearEstimator(
                 Quadratic(),
                 WeightedL1(self.reg / self.A.shape[0], weights),
-                max_iter=1, max_epochs=100000,
-                tol=1e-16, fit_intercept=False,
-                warm_start=False, verbose=False,
+                solver,
             )
         else:
             self.clf = GeneralizedLinearEstimator(
                 Huber(self.delta),
                 WeightedL1(self.reg / self.A.shape[0], weights),
-                max_iter=1, max_epochs=100000,
-                tol=1e-16, fit_intercept=False,
-                warm_start=False, verbose=False,
+                solver,
             )
         self.run(2)
 
@@ -65,7 +66,7 @@ class Solver(BaseSolver):
         p = self.A.shape[1]
         L = np.tri(p)
         AL = self.A @ L
-        self.clf.max_iter = n_iter
+        self.clf.solver.max_iter = n_iter
         self.clf.fit(AL, self.y)
         z = self.clf.coef_.flatten()
         self.u = np.cumsum(z)
