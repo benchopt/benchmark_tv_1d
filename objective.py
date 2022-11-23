@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
+    min_benchopt_version = "1.3"
     name = "TV1D"
 
     parameters = {'reg': [0.5],
@@ -36,7 +37,7 @@ class Objective(BaseObjective):
     def get_one_solution(self):
         return np.zeros(self.A.shape[1])
 
-    def to_dict(self):
+    def get_objective(self):
         return dict(A=self.A, reg=self.reg_scaled, y=self.y, c=self.c,
                     delta=self.delta, data_fit=self.data_fit)
 
