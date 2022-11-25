@@ -4,8 +4,8 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy import optimize
-    huber = import_ctx.import_from('shared', 'huber')
-    grad_huber = import_ctx.import_from('shared', 'grad_huber')
+    from benchmark_utils.shared import huber
+    from benchmark_utils.shared import grad_huber
 
 
 class Objective(BaseObjective):

@@ -17,8 +17,8 @@ solver:
   - FP synthesis[alpha=1.9,use_acceleration=True]
   - Primal PGD analysis[alpha=1.0,use_acceleration=False]
   - Primal PGD analysis[alpha=1.0,use_acceleration=True]
-  - Primal PGD synthesis (ISTA)[alpha=1.0,use_acceleration=True]
-  - Primal PGD synthesis (ISTA)[alpha=1.9,use_acceleration=False]
+  - Primal PGD synthesis*[alpha=1.0,use_acceleration=True]
+  - Primal PGD synthesis*[alpha=1.9,use_acceleration=False]
   - skglm synthesis
 n-repetitions: 5
 timeout: 6000
