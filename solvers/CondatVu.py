@@ -4,9 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    get_l2norm = import_ctx.import_from('shared', 'get_l2norm')
-    st = import_ctx.import_from('shared', 'st')
-    grad_huber = import_ctx.import_from('shared', 'grad_huber')
+    from benchmark_utils.shared import grad_huber
+    from benchmark_utils.shared import get_l2norm
 
 
 class Solver(BaseSolver):

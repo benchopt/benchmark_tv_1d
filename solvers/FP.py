@@ -4,8 +4,8 @@ from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-    prox_z = import_ctx.import_from('shared', 'prox_z')
-    grad_huber = import_ctx.import_from('shared', 'grad_huber')
+    from benchmark_utils.shared import prox_z
+    from benchmark_utils.shared import grad_huber
 
 
 class Solver(BaseSolver):
