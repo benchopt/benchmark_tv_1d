@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     """Solve the TV minimization problem using a majorization-minimization algorithm."""
 
-    name = 'gtv_mm'
+    name = 'Group TV MM'
     stopping_strategy = 'iteration'
     parameters = {"tol": [1e-3, 1e-4, 1e-5, 1e-6],
                   "K": [1, 2, 3, 4, 5]}

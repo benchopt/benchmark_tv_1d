@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     """Solve the TV minimization problem using a majorization-minimization algorithm."""
 
-    name = 'tv_mm'
+    name = 'Linearized Taut String'
     stopping_strategy = SingleRunCriterion()
 
     def set_objective(self, A, reg, y, c , delta, data_fit):
