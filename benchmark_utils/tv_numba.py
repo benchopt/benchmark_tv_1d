@@ -38,7 +38,7 @@ nb1d32c = nb.types.Array(nb.types.complex64, 1, "A")
 
 @nb.njit([nb1d32(nbr1d32, nb.types.float32, nb1d32),
           nb1d64(nbr1d64, nb.types.float64, nb1d64),])
-def linearizedTautString(y, lmbd, x):
+def linearized_taut_string(y, lmbd, x):
     """Linearized Taut String algorithm.
 
     Follows the algorithm described in [1]_, analoguous to the Condat algorithm [2]_.
@@ -63,71 +63,71 @@ def linearizedTautString(y, lmbd, x):
     """
 
     i = 0
-    mnHeight = mxHeight = 0
+    mn_height = mx_height = 0
     mn = y[0] - lmbd
     mx = y[0] + lmbd
-    lastBreak = -1
-    mnBreak = mxBreak = 0
+    last_break = -1
+    mn_break = mx_break = 0
     N = len(y)
     while i < N:
         while i < N - 1:
-            mnHeight += mn - y[i]
-            if lmbd < mnHeight:
-                i = mnBreak + 1
-                x[lastBreak + 1 : mnBreak + 1] = mn
-                lastBreak = mnBreak
+            mn_height += mn - y[i]
+            if lmbd < mn_height:
+                i = mn_break + 1
+                x[last_break + 1 : mn_break + 1] = mn
+                last_break = mn_break
                 mn = y[i]
                 mx = 2 * lmbd + mn
-                mxHeight = lmbd
-                mnHeight = -lmbd
-                mnBreak = mxBreak = i
+                mx_height = lmbd
+                mn_height = -lmbd
+                mn_break = mx_break = i
                 i += 1
                 continue
-            mxHeight += mx - y[i]
-            if -lmbd > mxHeight:
-                i = mxBreak + 1
-                x[lastBreak + 1 : mxBreak + 1] = mx
-                lastBreak = mxBreak
+            mx_height += mx - y[i]
+            if -lmbd > mx_height:
+                i = mx_break + 1
+                x[last_break + 1 : mx_break + 1] = mx
+                last_break = mx_break
                 mx = y[i]
                 mn = mx - 2 * lmbd
-                mnHeight = lmbd
-                mxHeight = -lmbd
-                mnBreak = mxBreak = i
+                mn_height = lmbd
+                mx_height = -lmbd
+                mn_break = mx_break = i
                 i += 1
                 continue
-            if mxHeight > lmbd:
-                mx += (lmbd - mxHeight) / (i - lastBreak)
-                mxHeight = lmbd
-                mxBreak = i
-            if mnHeight <= -lmbd:
-                mn += (-lmbd - mnHeight) / (i - lastBreak)
-                mnHeight = -lmbd
-                mnBreak = i
+            if mx_height > lmbd:
+                mx += (lmbd - mx_height) / (i - last_break)
+                mx_height = lmbd
+                mx_break = i
+            if mn_height <= -lmbd:
+                mn += (-lmbd - mn_height) / (i - last_break)
+                mn_height = -lmbd
+                mn_break = i
             i += 1
-        mnHeight += mn - y[i]
-        if mnHeight > 0:
-            i = mnBreak + 1
-            x[lastBreak + 1 : mnBreak + 1] = mn
-            lastBreak = mnBreak
+        mn_height += mn - y[i]
+        if mn_height > 0:
+            i = mn_break + 1
+            x[last_break + 1 : mn_break + 1] = mn
+            last_break = mn_break
             mn = y[i]
             mx = 2 * lmbd + mn
-            mxHeight = mnHeight = -lmbd
-            mnBreak = mxBreak = i
+            mx_height = mn_height = -lmbd
+            mn_break = mx_break = i
             continue
-        mxHeight += mx - y[i]
-        if mxHeight < 0:
-            i = mxBreak + 1
-            x[lastBreak + 1 : mxBreak + 1] = mx
-            lastBreak = mxBreak
+        mx_height += mx - y[i]
+        if mx_height < 0:
+            i = mx_break + 1
+            x[last_break + 1 : mx_break + 1] = mx
+            last_break = mx_break
             mx = y[i]
             mn = mx - 2 * lmbd
-            mnHeight = mxHeight = lmbd
-            mnBreak = mxBreak = i
+            mn_height = mx_height = lmbd
+            mn_break = mx_break = i
             continue
-        if mnHeight <= 0:
-            mn += (-mnHeight) / (i - lastBreak)
+        if mn_height <= 0:
+            mn += (-mn_height) / (i - last_break)
         i += 1
-    x[lastBreak + 1 :] = mn
+    x[last_break + 1 :] = mn
     return x
 
 #######################################
@@ -384,4 +384,3 @@ def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
         else:
             cost_prev = cost
     return x
-
