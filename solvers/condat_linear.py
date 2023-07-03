@@ -10,7 +10,7 @@ class Solver(BaseSolver):
     """Solve the TV minimization problem using a majorization-minimization algorithm."""
 
     name = 'Linearized Taut String'
-    stopping_strategy = SingleRunCriterion()
+    stopping_criterion = SingleRunCriterion()
 
     def set_objective(self, A, reg, y, c , delta, data_fit):
         self.reg = reg
@@ -26,7 +26,8 @@ class Solver(BaseSolver):
         return False, None
 
     def run(self, n_iter):
-        self.u = linearizedTautString(self.y, self.reg)
+        self.u = np.zeros_like(self.y)
+        linearizedTautString(self.y, self.reg, self.u)
 
     def get_result(self):
         return self.u

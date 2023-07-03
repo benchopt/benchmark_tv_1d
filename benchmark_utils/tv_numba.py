@@ -36,7 +36,8 @@ nb1d64c = nb.types.Array(nb.types.complex128, 1, "A")
 nb1d32c = nb.types.Array(nb.types.complex64, 1, "A")
 
 
-@nb.njit(nb1d32(nbr1d32, nb.types.float32, nb1d32))
+@nb.njit([nb1d32(nbr1d32, nb.types.float32, nb1d32),
+          nb1d64(nbr1d64, nb.types.float64, nb1d64),])
 def linearizedTautString(y, lmbd, x):
     """Linearized Taut String algorithm.
 
