@@ -2,7 +2,6 @@ from benchopt import BaseSolver
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
-    import numpy as np
     from benchmark_utils.tv_numba import gtv_mm_tol2
 
 class Solver(BaseSolver):

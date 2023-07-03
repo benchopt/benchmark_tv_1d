@@ -3,7 +3,6 @@ from benchopt import safe_import_context
 from benchopt.stopping_criterion import SingleRunCriterion
 with safe_import_context() as import_ctx:
     import numpy as np
-    import numba as nb
     from benchmark_utils.tv_numba import linearizedTautString
 
 class Solver(BaseSolver):
