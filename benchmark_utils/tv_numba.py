@@ -36,12 +36,16 @@ nb1d64c = nb.types.Array(nb.types.complex128, 1, "A")
 nb1d32c = nb.types.Array(nb.types.complex64, 1, "A")
 
 
-@nb.njit([nb1d32(nbr1d32, nb.types.float32, nb1d32),
-          nb1d64(nbr1d64, nb.types.float64, nb1d64),])
+@nb.njit(
+    [
+        nb1d32(nbr1d32, nb.types.float32, nb1d32),
+        nb1d64(nbr1d64, nb.types.float64, nb1d64),
+    ]
+)
 def linearized_taut_string(y, lmbd, x):
     """Linearized Taut String algorithm.
 
-    Follows the algorithm described in [1]_, analoguous to the Condat algorithm [2]_.
+    Follows the algorithm described in [1]_, analoguous to the algorithm [2]_.
     Parameters
     ----------
     y: np.ndarray
@@ -130,6 +134,7 @@ def linearized_taut_string(y, lmbd, x):
     x[last_break + 1 :] = mn
     return x
 
+
 #######################################
 #   ProxTV 1D using an MM algorithm   #
 #######################################
@@ -185,7 +190,10 @@ def difft(x):
 
 
 @nb.njit(
-    ["void(f8[:],f8[:],f8[:],f8[:],f8[:])", "void(f4[:],f4[:],f4[:],f4[:],f4[:])"],
+    [
+        "void(f8[:],f8[:],f8[:],f8[:],f8[:])",
+        "void(f4[:],f4[:],f4[:],f4[:],f4[:])",
+    ],
     fastmath=True,
 )
 def TDMA(a, b, c, d, x):
@@ -218,7 +226,8 @@ def TDMA(a, b, c, d, x):
         \end{bmatrix}
         \begin{bmatrix} x_0 \\ x_1 \\ \vdots \\   x_{n-1}\end{bmatrix} =
         \begin{bmatrix} d_0 \\ d_1 \\ \vdots \\ d_{n-1} \\\end{bmatrix}
-    See [1]_ for more details. This function is based on the implementation in [2]_.
+    See [1]_ for more details.
+    This function is based on the implementation in [2]_.
 
     References
     ----------
@@ -276,7 +285,6 @@ def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
     return x
 
 
-
 @nb.njit(
     [nb1d32(nb1d32, nb.types.int16), nb1d64(nb1d64, nb.types.int16)],
     fastmath=True,
@@ -330,7 +338,7 @@ def running_sum_valid(arr, K):
     error_model="numpy",
 )
 def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
-    """Group Total Variation denoising using the Majoration-Minimization algorithm.
+    """Group Total Variation denoising with Majoration-Minimization algorithm.
 
     Parameters
     ----------
@@ -352,10 +360,10 @@ def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
 
     References
     ----------
-    .. [1]  I. W. Selesnick and P.-Y. Chen, “Total variation denoising with overlapping
-      group sparsity” in 2013 IEEE International Conference on Acoustics, Speech and
-      Signal Processing, Vancouver, BC, Canada, May 2013, pp. 5696–5700.
-      doi: 10.1109/ICASSP.2013.6638755.
+    .. [1]  I. W. Selesnick and P.-Y. Chen, “Total variation denoising with
+      overlapping group sparsity” in 2013 IEEE International Conference on
+      Acoustics, Speech and Signal Processing, Vancouver, BC, Canada,
+      May 2013, pp. 5696–5700. doi: 10.1109/ICASSP.2013.6638755.
     """
     N = len(y)
     ddt_up = -np.ones(N - 1, dtype=y.dtype)
