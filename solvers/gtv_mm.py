@@ -13,6 +13,8 @@ class Solver(BaseSolver):
     parameters = {"tol": [1e-3, 1e-4, 1e-5, 1e-6],
                   "K": [1, 2, 3, 4, 5]}
 
+    requirements = ['pip:numba']
+
     def set_objective(self, A, reg, y, c , delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y

@@ -11,6 +11,7 @@ class Solver(BaseSolver):
 
     name = 'Linearized Taut String'
     stopping_criterion = SingleRunCriterion()
+    requirements = ['pip:numba']
 
     def set_objective(self, A, reg, y, c , delta, data_fit):
         self.reg = reg
