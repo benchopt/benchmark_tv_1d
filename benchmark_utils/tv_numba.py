@@ -258,6 +258,11 @@ def TDMA(a, b, c, d, x):
     ]
 )
 def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
+    """ProxTV 1D using an MM algorithm.
+
+    I. Selesnick, “Total Variation Denoising (an MM algorithm)”.
+    https://eeweb.engineering.nyu.edu/iselesni/lecture_notes/TVDmm/
+    """
     N = len(y)
     ddt_up = -np.ones(N - 1, dtype=y.dtype)
     ddt_diag = 2 * np.ones(N - 1, dtype=y.dtype)

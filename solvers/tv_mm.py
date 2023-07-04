@@ -6,7 +6,11 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Solve the TV minimization problem using a majorization-minimization algorithm."""
+    """Solve the TV minimization problem using a majorization-minimization algorithm.
+
+    I. Selesnick, “Total Variation Denoising (an MM algorithm)”.
+    https://eeweb.engineering.nyu.edu/iselesni/lecture_notes/TVDmm/
+    """
 
     name = "tv_mm"
     stopping_strategy = "iteration"
