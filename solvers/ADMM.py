@@ -8,9 +8,7 @@ with safe_import_context() as import_ctx:
     from scipy.sparse.linalg import LinearOperator
     from scipy.sparse.linalg import cg
     from scipy.optimize import minimize
-    st = import_ctx.import_from('shared', 'st')
-    huber = import_ctx.import_from('shared', 'huber')
-    grad_huber = import_ctx.import_from('shared', 'grad_huber')
+    from benchmark_utils.shared import st, huber, grad_huber
 
 
 def loss(y, A, u, delta, z, mu, gamma):
