@@ -64,7 +64,8 @@ def linearized_taut_string(y, lmbd, x):
     References
     ----------
     .. [1] https://github.com/albarji/proxTV/blob/master/src/TVL1opt.cpp
-    .. [2] Condat, L. (2013). A direct algorithm for 1D total variation denoising.
+    .. [2] Condat, L. (2013) A direct algorithm for 1D total variation
+    denoising.
     """
 
     i = 0

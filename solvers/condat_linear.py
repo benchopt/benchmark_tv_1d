@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Solve the TV minimization problem using a majorization-minimization algorithm.
+    """Direct algorithm for 1D TV denoising.
 
     Condat, L. (2013). A direct algorithm for 1D total variation denoising.
     https://github.com/albarji/proxTV/blob/master/src/TVL1opt.cpp
