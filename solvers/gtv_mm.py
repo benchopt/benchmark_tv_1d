@@ -15,7 +15,7 @@ class Solver(BaseSolver):
 
     name = "Group TV MM"
     stopping_strategy = "iteration"
-    parameters = {"tol": [1e-3, 1e-4, 1e-5, 1e-6], "K": [1, 2, 3, 4, 5]}
+    parameters = {"K": [1, 2, 3, 4, 5]}
 
     requirements = ["pip:numba"]
 
@@ -23,6 +23,7 @@ class Solver(BaseSolver):
         self.reg = reg
         self.A, self.y = A, y
         self.c = c
+        self.tol = 1e-8
         self.data_fit = data_fit
         # Delta is ignored, only used for huber function.
         self.run(5)

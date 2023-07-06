@@ -5,6 +5,7 @@ with safe_import_context() as import_ctx:
     from benchmark_utils.tv_numba import tv_mm
 
 
+
 class Solver(BaseSolver):
     """TV Denoising with Majoration-Minimisation.
 
@@ -14,7 +15,6 @@ class Solver(BaseSolver):
 
     name = "tv_mm"
     stopping_strategy = "iteration"
-    parameters = {"tol": [1e-3, 1e-4, 1e-5, 1e-6]}
     requirements = ["pip:numba"]
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
@@ -22,6 +22,7 @@ class Solver(BaseSolver):
         self.A, self.y = A, y
         self.c = c
         self.data_fit = data_fit
+        self.tol = 1e-8
         # Delta is ignored, only used for huber function.
         self.run(5)
 
