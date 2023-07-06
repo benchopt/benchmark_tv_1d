@@ -1,4 +1,4 @@
-"""
+r"""
 Proximity Operator for Total Variation in 1D.
 
 This solve the problem:
@@ -7,7 +7,8 @@ This solve the problem:
 
 Three implemtation are availables:
 - linearizedTautString: Algorihtm by Condat in O(n)
--
+- TV MM
+- Group TV MM
 """
 import numpy as np
 
@@ -78,7 +79,7 @@ def linearized_taut_string(y, lmbd, x):
             mn_height += mn - y[i]
             if lmbd < mn_height:
                 i = mn_break + 1
-                x[last_break + 1 : mn_break + 1] = mn
+                x[last_break + 1: mn_break + 1] = mn
                 last_break = mn_break
                 mn = y[i]
                 mx = 2 * lmbd + mn
@@ -90,7 +91,7 @@ def linearized_taut_string(y, lmbd, x):
             mx_height += mx - y[i]
             if -lmbd > mx_height:
                 i = mx_break + 1
-                x[last_break + 1 : mx_break + 1] = mx
+                x[last_break + 1: mx_break + 1] = mx
                 last_break = mx_break
                 mx = y[i]
                 mn = mx - 2 * lmbd
@@ -111,7 +112,7 @@ def linearized_taut_string(y, lmbd, x):
         mn_height += mn - y[i]
         if mn_height > 0:
             i = mn_break + 1
-            x[last_break + 1 : mn_break + 1] = mn
+            x[last_break + 1: mn_break + 1] = mn
             last_break = mn_break
             mn = y[i]
             mx = 2 * lmbd + mn
@@ -121,7 +122,7 @@ def linearized_taut_string(y, lmbd, x):
         mx_height += mx - y[i]
         if mx_height < 0:
             i = mx_break + 1
-            x[last_break + 1 : mx_break + 1] = mx
+            x[last_break + 1: mx_break + 1] = mx
             last_break = mx_break
             mx = y[i]
             mn = mx - 2 * lmbd
@@ -131,7 +132,7 @@ def linearized_taut_string(y, lmbd, x):
         if mn_height <= 0:
             mn += (-mn_height) / (i - last_break)
         i += 1
-    x[last_break + 1 :] = mn
+    x[last_break + 1:] = mn
     return x
 
 
@@ -159,7 +160,7 @@ def fast_cost(y, x, r, lmbd):
     fastmath=True,
 )
 def difft(x):
-    """Apply the matrix D^T to x.
+    r"""Apply the matrix D^T to x.
 
     Parameters
     ----------
@@ -197,7 +198,7 @@ def difft(x):
     fastmath=True,
 )
 def TDMA(a, b, c, d, x):
-    """
+    r"""
     Solve a tridiagonal system of equations.
 
     Parameters

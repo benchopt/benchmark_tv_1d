@@ -6,7 +6,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    """Solve the TV minimization problem using a majorization-minimization algorithm.
+    """Group TV Denoising with Majoration-Minimisation.
 
     I. W. Selesnick and P.-Y. Chen, “Total variation denoising with overlapping
     group sparsity”, 2013

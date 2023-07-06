@@ -67,7 +67,7 @@ class Dataset(BaseDataset):
         else:
             regressor = np.zeros(n_samples)
             while t < duration:
-                regressor[t : t + self.block_on] = 1
+                regressor[t: t + self.block_on] = 1
                 t += block_size
 
         # Add noise
