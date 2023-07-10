@@ -29,14 +29,12 @@ class Solver(BaseSolver):
                   'use_acceleration': [False, True],
                   'prox_op': ["condat_C", "tv_mm", "condat_numba"]}
 
-
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
         self.A, self.y = A, y
         self.c = c
         self.delta = delta
         self.data_fit = data_fit
-
 
     def run(self, callback):
         if self.prox_op == "condat_C":

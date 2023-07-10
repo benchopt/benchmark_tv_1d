@@ -1,10 +1,8 @@
 from benchopt import BaseSolver
 from benchopt import safe_import_context
-from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     from benchmark_utils.tv_numba import tv_mm, jit_module
-
 
 
 class Solver(BaseSolver):
@@ -31,10 +29,9 @@ class Solver(BaseSolver):
         if objective_dict["data_fit"] != "quad":
             return True, "TVMM solver only useable for quadratic data_fit"
         A = objective_dict["A"]
-        if getattr(A,"_op_type", None) != "identity":
+        if getattr(A, "_op_type", None) != "identity":
             return True, "TVMM solver only useable for identity matrix"
         return False, None
-
 
     def run(self, n_iter):
         self.u = tv_mm(self.y, self.reg, n_iter, 0.0)

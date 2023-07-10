@@ -130,6 +130,7 @@ def linearized_taut_string(y, lmbd, x):
     x[last_break + 1:] = mn
     return x
 
+
 linearized_taut_string.jitter = nb.njit(
     [
         nb1d32(nbr1d32, nb.types.float32, nb1d32),
@@ -142,6 +143,8 @@ def prox_condat(y, lmbd):
     x = np.zeros_like(y)
     linearized_taut_string(y, lmbd, x)
     return x
+
+
 #######################################
 #   ProxTV 1D using an MM algorithm   #
 #######################################
@@ -150,7 +153,8 @@ def prox_condat(y, lmbd):
 def fast_cost(y, x, r, lmbd):
     return 0.5 * np.sqrt(np.sum(np.abs(y - x) ** 2)) + lmbd * np.sum(r)
 
-fast_cost.jitter =  nb.njit(
+
+fast_cost.jitter = nb.njit(
     [
         nb.types.float32(nbr1d32, nb1d32, nb1d32, nb.types.float32),
         nb.types.float64(nbr1d64, nb1d64, nb1d64, nb.types.float64),
@@ -189,6 +193,7 @@ def difft(x):
     y[-1] = x[-1]
     return y
 
+
 difft.jitter = nb.njit(
     [
         nb1d32(nb1d32),
@@ -196,7 +201,6 @@ difft.jitter = nb.njit(
     ],
     fastmath=True,
 )
-
 
 
 def TDMA(a, b, c, d, x):
@@ -295,13 +299,13 @@ def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
             cost_prev = cost
     return x
 
+
 tv_mm.jitter = nb.njit(
     [
         nb1d32(nbr1d32, nb.types.float32, nb.types.int16, nb.types.float32),
         nb1d64(nbr1d64, nb.types.float64, nb.types.int16, nb.types.float64),
     ]
 )
-
 
 
 def running_sum_valid(arr, K):
@@ -331,11 +335,13 @@ def running_sum_valid(arr, K):
         i += 1
     return ret
 
+
 running_sum_valid.jitter = nb.njit(
     [nb1d32(nb1d32, nb.types.int16), nb1d64(nb1d64, nb.types.int16)],
     fastmath=True,
     error_model="numpy",
 )
+
 
 def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
     """Group Total Variation denoising with Majoration-Minimization algorithm.
@@ -393,6 +399,7 @@ def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
             cost_prev = cost
     return x
 
+
 gtv_mm_tol2.jitter = nb.njit(
     [
         nb.types.Array(nb.types.float64, 1, "A")(
@@ -414,6 +421,7 @@ gtv_mm_tol2.jitter = nb.njit(
 )
 
 JITTED = False
+
 
 def jit_module():
     """Jit all functions in this module."""
