@@ -37,12 +37,6 @@ nb1d64c = nb.types.Array(nb.types.complex128, 1, "A")
 nb1d32c = nb.types.Array(nb.types.complex64, 1, "A")
 
 
-@nb.njit(
-    [
-        nb1d32(nbr1d32, nb.types.float32, nb1d32),
-        nb1d64(nbr1d64, nb.types.float64, nb1d64),
-    ]
-)
 def linearized_taut_string(y, lmbd, x):
     """Linearized Taut String algorithm.
 
@@ -136,30 +130,35 @@ def linearized_taut_string(y, lmbd, x):
     x[last_break + 1:] = mn
     return x
 
+linearized_taut_string.jitter = nb.njit(
+    [
+        nb1d32(nbr1d32, nb.types.float32, nb1d32),
+        nb1d64(nbr1d64, nb.types.float64, nb1d64),
+    ]
+)
 
+
+def prox_condat(y, lmbd):
+    x = np.zeros_like(y)
+    linearized_taut_string(y, lmbd, x)
+    return x
 #######################################
 #   ProxTV 1D using an MM algorithm   #
 #######################################
 
 
-@nb.njit(
+def fast_cost(y, x, r, lmbd):
+    return 0.5 * np.sqrt(np.sum(np.abs(y - x) ** 2)) + lmbd * np.sum(r)
+
+fast_cost.jitter =  nb.njit(
     [
         nb.types.float32(nbr1d32, nb1d32, nb1d32, nb.types.float32),
         nb.types.float64(nbr1d64, nb1d64, nb1d64, nb.types.float64),
     ],
     fastmath=True,
 )
-def fast_cost(y, x, r, lmbd):
-    return 0.5 * np.sqrt(np.sum(np.abs(y - x) ** 2)) + lmbd * np.sum(r)
 
 
-@nb.njit(
-    [
-        nb1d32(nb1d32),
-        nb1d64(nb1d64),
-    ],
-    fastmath=True,
-)
 def difft(x):
     r"""Apply the matrix D^T to x.
 
@@ -190,14 +189,16 @@ def difft(x):
     y[-1] = x[-1]
     return y
 
-
-@nb.njit(
+difft.jitter = nb.njit(
     [
-        "void(f8[:],f8[:],f8[:],f8[:],f8[:])",
-        "void(f4[:],f4[:],f4[:],f4[:],f4[:])",
+        nb1d32(nb1d32),
+        nb1d64(nb1d64),
     ],
     fastmath=True,
 )
+
+
+
 def TDMA(a, b, c, d, x):
     r"""
     Solve a tridiagonal system of equations.
@@ -253,12 +254,15 @@ def TDMA(a, b, c, d, x):
         x[i - 1] = g[i - 1] - w[i - 1] * x[i]
 
 
-@nb.njit(
+TDMA.jitter = nb.njit(
     [
-        nb1d32(nbr1d32, nb.types.float32, nb.types.int16, nb.types.float32),
-        nb1d64(nbr1d64, nb.types.float64, nb.types.int16, nb.types.float64),
-    ]
+        "void(f8[:],f8[:],f8[:],f8[:],f8[:])",
+        "void(f4[:],f4[:],f4[:],f4[:],f4[:])",
+    ],
+    fastmath=True,
 )
+
+
 def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
     """ProxTV 1D using an MM algorithm.
 
@@ -291,12 +295,15 @@ def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
             cost_prev = cost
     return x
 
-
-@nb.njit(
-    [nb1d32(nb1d32, nb.types.int16), nb1d64(nb1d64, nb.types.int16)],
-    fastmath=True,
-    error_model="numpy",
+tv_mm.jitter = nb.njit(
+    [
+        nb1d32(nbr1d32, nb.types.float32, nb.types.int16, nb.types.float32),
+        nb1d64(nbr1d64, nb.types.float64, nb.types.int16, nb.types.float64),
+    ]
 )
+
+
+
 def running_sum_valid(arr, K):
     """Compute the running sum of an array.
 
@@ -324,26 +331,12 @@ def running_sum_valid(arr, K):
         i += 1
     return ret
 
-
-@nb.njit(
-    [
-        nb.types.Array(nb.types.float64, 1, "A")(
-            nbr1d64,
-            nb.types.float64,
-            nb.types.int16,
-            nb.types.int16,
-            nb.types.float64,
-        ),
-        nb.types.Array(nb.types.float32, 1, "A")(
-            nbr1d32,
-            nb.types.float32,
-            nb.types.int16,
-            nb.types.int16,
-            nb.types.float32,
-        ),
-    ],
+running_sum_valid.jitter = nb.njit(
+    [nb1d32(nb1d32, nb.types.int16), nb1d64(nb1d64, nb.types.int16)],
+    fastmath=True,
     error_model="numpy",
 )
+
 def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
     """Group Total Variation denoising with Majoration-Minimization algorithm.
 
@@ -399,3 +392,35 @@ def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
         else:
             cost_prev = cost
     return x
+
+gtv_mm_tol2.jitter = nb.njit(
+    [
+        nb.types.Array(nb.types.float64, 1, "A")(
+            nbr1d64,
+            nb.types.float64,
+            nb.types.int16,
+            nb.types.int16,
+            nb.types.float64,
+        ),
+        nb.types.Array(nb.types.float32, 1, "A")(
+            nbr1d32,
+            nb.types.float32,
+            nb.types.int16,
+            nb.types.int16,
+            nb.types.float32,
+        ),
+    ],
+    error_model="numpy",
+)
+
+JITTED = False
+
+def jit_module():
+    """Jit all functions in this module."""
+    global JITTED
+    if JITTED:
+        return
+    JITTED = True
+    for name, func in globals().items():
+        if hasattr(func, "jitter"):
+            globals()[name] = func.jitter(func)
