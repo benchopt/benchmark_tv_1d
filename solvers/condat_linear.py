@@ -3,8 +3,7 @@ from benchopt import safe_import_context
 from benchopt.stopping_criterion import SingleRunCriterion
 
 with safe_import_context() as import_ctx:
-    import numpy as np
-    from benchmark_utils.tv_numba import linearized_taut_string
+    from benchmark_utils.tv_numba import prox_condat, jit_module
 
 
 class Solver(BaseSolver):
@@ -24,7 +23,7 @@ class Solver(BaseSolver):
         self.c = c
         self.data_fit = data_fit
         # Delta is ignored, only used for huber function.
-        self.run(5)
+        jit_module()
 
     def skip(self, **objective_dict):
         if objective_dict["data_fit"] != "quad":
@@ -32,8 +31,7 @@ class Solver(BaseSolver):
         return False, None
 
     def run(self, n_iter):
-        self.u = np.zeros_like(self.y)
-        linearized_taut_string(self.y, self.reg, self.u)
+        self.u = prox_condat(self.y, self.reg)
 
     def get_result(self):
         return self.u

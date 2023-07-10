@@ -2,8 +2,7 @@ from benchopt import BaseSolver
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
-    from benchmark_utils.tv_numba import gtv_mm_tol2
-
+    from benchmark_utils.tv_numba import gtv_mm_tol2, jit_module
 
 class Solver(BaseSolver):
     """Group TV Denoising with Majoration-Minimisation.
@@ -26,7 +25,7 @@ class Solver(BaseSolver):
         self.tol = 1e-8
         self.data_fit = data_fit
         # Delta is ignored, only used for huber function.
-        self.run(5)
+        jit_module()
 
     def skip(self, **objective_dict):
         if objective_dict["data_fit"] != "quad":
