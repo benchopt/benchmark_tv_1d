@@ -15,7 +15,7 @@ class Solver(BaseSolver):
 
     name = "Group TV MM"
     stopping_strategy = "iteration"
-    parameters = {"K": [1, 2, 3, 4, 5]}
+    parameters = {"group_size": [1, 2, 3, 4, 5]}
 
     requirements = ["pip:numba"]
 
@@ -34,7 +34,7 @@ class Solver(BaseSolver):
         return False, None
 
     def run(self, n_iter):
-        self.u = gtv_mm_tol2(self.y, self.reg, self.K, n_iter, self.tol)
+        self.u = gtv_mm_tol2(self.y, self.reg, self.group_size, n_iter, self.tol)
 
     def get_result(self):
         return self.u
