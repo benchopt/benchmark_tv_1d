@@ -55,38 +55,33 @@ class Dataset(BaseDataset):
             event.append((t, self.block_on, 1))
             t += block_size
         events = np.array(event)
-        if self.use_hrf:
-            regressor, _ = compute_regressor(
-                events.T,
-                "glover",
-                np.arange(0, n_samples) * self.sim_tr,
-                oversampling=50,
-                min_onset=-24,
-            )
-            regressor = np.squeeze(regressor)
-        else:
-            regressor = np.zeros(n_samples)
-            while t < duration:
-                regressor[t: t + self.block_on] = 1
-                t += block_size
+        regressor, _ = compute_regressor(
+            events.T,
+            "glover",
+            np.arange(0, n_samples) * self.sim_tr,
+            oversampling=50,
+            min_onset=-24,
+        )
+        regressor = np.squeeze(regressor)
 
         # Add noise
         noise = rng.randn(n_samples)
         noise *= np.linalg.norm(regressor) * self.noise_level
         regressor_noise = regressor + noise
 
-        # A = Identity
-        # y = A x + noise
+        A = LinearOperator(
+            dtype=np.float64,
+            matvec=lambda x: x,
+            matmat=lambda X: X,
+            rmatvec=lambda x: x,
+            rmatmat=lambda X: X,
+            shape=(len(regressor), len(regressor)),
+        )
 
+        A._op_type = "identity"
+        # y = A x + noise
         return {
-            "A": LinearOperator(
-                dtype=np.float64,
-                matvec=lambda x: x,
-                matmat=lambda X: X,
-                rmatvec=lambda x: x,
-                rmatmat=lambda X: X,
-                shape=(n_samples, n_samples),
-            ),
-            "y": regressor_noise,
+            "A": A,
             "x": regressor,
+            "y": regressor_noise,
         }
