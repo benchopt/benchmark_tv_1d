@@ -14,11 +14,13 @@ class Dataset(BaseDataset):
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     parameters = {
-        'n_samples': [400],
-        'n_features': [250],
+        'type_A, n_samples, n_features': [
+            ['identity', 400, 400],
+            ['random', 400, 250],
+            ['conv', 400, 250]
+        ],
         'n_blocks': [10],
         'loc, scale': [(0, 0.1)],
-        'type_A': ['identity', 'random', 'conv'],
         'type_x': ['block', 'sin'],
         'type_n': ['gaussian', 'laplace'],
         'random_state': [27]
