@@ -20,7 +20,7 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
 
     # We need blas devel to get the include file for BLAS/LAPACK operations
-    requirements = ['pip:prox-tv', 'numba']
+    requirements = ['blas-devel', 'pip:prox-tv', 'numba']
 
     stopping_criterion = SufficientProgressCriterion(
         patience=3, strategy='callback'
