@@ -63,7 +63,8 @@ class Solver(BaseSolver):
                 u[:] = u_acc
             u = prox_op(
                 u - stepsize * self.grad(self.A, u),
-                self.reg * stepsize)
+                self.reg * stepsize,
+            )
             if self.use_acceleration:
                 u_acc[:] = u + (t_old - 1.) / t_new * (u - u_old)
         self.u = u
