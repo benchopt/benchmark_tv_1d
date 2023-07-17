@@ -8,7 +8,9 @@ with safe_import_context() as import_ctx:
     import prox_tv as ptv
     from benchmark_utils.shared import grad_huber
     from benchmark_utils.shared import get_l2norm
-    from benchmark_utils.tv_numba import tv_mm, gtv_mm_tol2, jit_module, prox_condat
+    from benchmark_utils.tv_numba import (
+        tv_mm, gtv_mm_tol2, jit_module, prox_condat,
+    )
 
 
 class Solver(BaseSolver):
@@ -25,9 +27,11 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'alpha': [1.],
-                  'use_acceleration': [False, True],
-                  'prox_op': ["condat_C", "tv_mm", "condat_numba", "gtv_mm3", "gtv_mm5"]}
+    parameters = {
+        'alpha': [1.],
+        'use_acceleration': [False, True],
+        'prox_op': ["condat_C", "tv_mm", "condat_numba", "gtv_mm3", "gtv_mm5"]
+    }
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -43,7 +47,7 @@ class Solver(BaseSolver):
             prox_op = partial(tv_mm, max_iter=1000, tol=1e-6)
         elif self.prox_op == "condat_numba":
             prox_op = prox_condat
-        elif "gtv_mm" in  self.prox_op:
+        elif "gtv_mm" in self.prox_op:
             K = int(self.prox_op[-1])
             prox_op = partial(gtv_mm_tol2, max_iter=1000, tol=1e-6, K=K)
         if self.prox_op != "condat_C":
