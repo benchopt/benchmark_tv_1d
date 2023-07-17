@@ -78,7 +78,6 @@ class Dataset(BaseDataset):
             shape=(len(regressor), len(regressor)),
         )
 
-        A._op_type = "identity"
         # y = A x + noise
         return {
             "A": A,

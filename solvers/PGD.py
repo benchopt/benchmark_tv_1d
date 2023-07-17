@@ -18,7 +18,7 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
 
     # We need blas devel to get the include file for BLAS/LAPACK operations
-    requirements = ['pip:prox-tv', 'pip:numba', 'pip:numpy']
+    requirements = ['pip:prox-tv', 'numba']
 
     stopping_criterion = SufficientProgressCriterion(
         patience=3, strategy='callback'
@@ -27,7 +27,7 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1.],
                   'use_acceleration': [False, True],
-                  'prox_op': ["condat_C", "tv_mm", "condat_numba"]}
+                  'prox_op': ["condat_C", "tv_mm", "condat_numba", "gtv_mm"]}
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
