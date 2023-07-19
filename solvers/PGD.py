@@ -40,19 +40,22 @@ class Solver(BaseSolver):
         self.delta = delta
         self.data_fit = data_fit
 
-    def run(self, callback):
+        self.prox_impl = None
         if self.prox_op == "condat_C":
-            prox_op = partial(ptv.tv1_1d, method='condat')
+            self.prox_impl = partial(ptv.tv1_1d, method='condat')
         elif self.prox_op == "tv_mm":
-            prox_op = partial(tv_mm, max_iter=1000, tol=1e-6)
+            self.prox_impl = partial(tv_mm, max_iter=1000, tol=1e-6)
         elif self.prox_op == "condat_numba":
-            prox_op = prox_condat
+            self.prox_impl = prox_condat
         elif "gtv_mm" in self.prox_op:
             K = int(self.prox_op[-1])
-            prox_op = partial(gtv_mm_tol2, max_iter=1000, tol=1e-6, K=K)
+            self.prox_impl = partial(gtv_mm_tol2, max_iter=1000, tol=1e-15, K=K)
+
+    def warm_up(self):
         if self.prox_op != "condat_C":
             jit_module()
 
+    def run(self, callback):
         p = self.A.shape[1]
         # alpha / rho
         stepsize = self.alpha / get_l2norm(self.A)**2
@@ -68,7 +71,7 @@ class Solver(BaseSolver):
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
                 u_old[:] = u
                 u[:] = u_acc
-            u = prox_op(
+            u = self.prox_impl(
                 u - stepsize * self.grad(self.A, u),
                 self.reg * stepsize,
             )
