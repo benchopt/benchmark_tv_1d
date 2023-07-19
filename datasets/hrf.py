@@ -46,7 +46,7 @@ class Dataset(BaseDataset):
         rng = np.random.RandomState(self.random_state)
         block_duration = self.block_on + self.block_off
         duration = self.n_blocks * block_duration
-        n_samples = duration / self.sim_tr
+        n_samples = int(duration / self.sim_tr)
 
         # create a repeating block design
         event = []
