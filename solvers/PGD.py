@@ -43,16 +43,16 @@ class Solver(BaseSolver):
         if self.prox_op != "condat_C":
             # We jit here to avoid using non jitted function definitions
             jit_module()
-        self.prox_impl = None
+        self.prox_f = None
         if self.prox_op == "condat_C":
-            self.prox_impl = partial(ptv.tv1_1d, method='condat')
+            self.prox_f = partial(ptv.tv1_1d, method='condat')
         elif self.prox_op == "tv_mm":
-            self.prox_impl = partial(tv_mm, max_iter=1000, tol=1e-6)
+            self.prox_f = partial(tv_mm, max_iter=1000, tol=1e-6)
         elif self.prox_op == "condat_numba":
-            self.prox_impl = prox_condat
+            self.prox_f = prox_condat
         elif "gtv_mm" in self.prox_op:
             K = int(self.prox_op[-1])
-            self.prox_impl = partial(gtv_mm_tol2, max_iter=1000, tol=1e-15, K=K)
+            self.prox_f = partial(gtv_mm_tol2, max_iter=1000, tol=1e-15, K=K)
 
     def run(self, callback):
         p = self.A.shape[1]
@@ -70,7 +70,7 @@ class Solver(BaseSolver):
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
                 u_old[:] = u
                 u[:] = u_acc
-            u = self.prox_impl(
+            u = self.prox_f(
                 u - stepsize * self.grad(self.A, u),
                 self.reg * stepsize,
             )
