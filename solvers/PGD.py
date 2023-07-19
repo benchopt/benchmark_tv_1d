@@ -40,6 +40,9 @@ class Solver(BaseSolver):
         self.delta = delta
         self.data_fit = data_fit
 
+        if self.prox_op != "condat_C":
+            # We jit here to avoid using non jitted function definitions
+            jit_module()
         self.prox_impl = None
         if self.prox_op == "condat_C":
             self.prox_impl = partial(ptv.tv1_1d, method='condat')
@@ -50,10 +53,6 @@ class Solver(BaseSolver):
         elif "gtv_mm" in self.prox_op:
             K = int(self.prox_op[-1])
             self.prox_impl = partial(gtv_mm_tol2, max_iter=1000, tol=1e-15, K=K)
-
-    def warm_up(self):
-        if self.prox_op != "condat_C":
-            jit_module()
 
     def run(self, callback):
         p = self.A.shape[1]
