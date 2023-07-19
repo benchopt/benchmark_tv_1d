@@ -45,11 +45,11 @@ def linearized_taut_string(y, lmbd, x):
     Parameters
     ----------
     y: np.ndarray
-        Input data.
+        Input data of shape (N,).
     lambda: float
         Regularization parameter.
     x: np.ndarray
-        Return value
+        Return value of shape (N,).
 
     Returns
     -------
@@ -174,12 +174,12 @@ def difft(x):
     Parameters
     ----------
     x: np.ndarray
-        Input data.
+        Input data of shape (N,).
 
     Returns
     -------
     np.ndarray
-        Output data.
+        Output data of shape (N + 1,).
 
     Notes
     -----
@@ -215,15 +215,15 @@ def TDMA(a, b, c, d, x):
     Parameters
     ----------
     a: np.ndarray
-        Lower diagonal.
+        Lower diagonal of shape (N - 1,).
     b: np.ndarray
-        Diagonal.
+        Diagonal of shape (N,).
     c: np.ndarray
-        Upper diagonal.
+        Upper diagonal of shape (N - 1,).
     d: np.ndarray
-        Right hand side.
+        Right hand side of shape (N,).
     x: np.ndarray
-        Solution.
+        Solution of shape (N,).
 
     Notes
     -----
@@ -275,6 +275,24 @@ TDMA.jitter = nb.njit(
 def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
     """ProxTV 1D using an MM algorithm.
 
+    Parameters
+    ----------
+    y: np.ndarray
+        Input data of shape (N,).
+    lmbd: float
+        Regularization parameter.
+    max_iter: int, optional
+        Maximum number of iterations.
+    tol: float, optional
+        Tolerance for convergence.
+
+    Returns
+    -------
+    np.ndarray
+        Output data of shape (N,).
+
+    References
+    ----------
     I. Selesnick, “Total Variation Denoising (an MM algorithm)”.
     https://eeweb.engineering.nyu.edu/iselesni/lecture_notes/TVDmm/
     """
@@ -320,6 +338,18 @@ def running_sum_valid(arr, K):
     and is slighly faster for our usecase.
     This reimplementation is necessary to enable numba to properly compile
     the gtv function.
+
+    Parameters
+    ----------
+    arr: np.ndarray
+        Input array of shape (N,).
+    K: int
+        Size of the running sum window.
+
+    Returns
+    -------
+    np.ndarray
+        Output array of shape (N,).
     """
     N = len(arr)
     ret = np.empty(N, arr.dtype)
