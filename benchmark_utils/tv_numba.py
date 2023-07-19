@@ -41,6 +41,7 @@ def linearized_taut_string(y, lmbd, x):
     """Linearized Taut String algorithm.
 
     Follows the algorithm described in [1]_, analoguous to the algorithm [2]_.
+
     Parameters
     ----------
     y: np.ndarray
@@ -63,10 +64,14 @@ def linearized_taut_string(y, lmbd, x):
     """
 
     i = 0
+    # Relative height of majorant and minorant sploes at the current points
+    # w.r.t the tube center.
     mn_height = mx_height = 0
-    mn = y[0] - lmbd
-    mx = y[0] + lmbd
+    # minorant and majorant of slope
+    mn, mx = y[0] - lmbd, y[0] + lmbd
+    # last breakpoint of taut string
     last_break = -1
+    # Last breakpoint of majorant and minorant
     mn_break = mx_break = 0
     N = len(y)
     while i < N:
@@ -323,7 +328,7 @@ def running_sum_valid(arr, K):
     running_buf = np.zeros(K + 1, arr.dtype)
     running_buf[: K // 2] = arr[: K // 2]
     s = np.sum(running_buf)
-    while i < N:
+    for i in range(N):
         if i + K // 2 >= N:
             running_buf[r] = 0
         else:
@@ -332,7 +337,6 @@ def running_sum_valid(arr, K):
         r = (r + 1) % (K + 1)
         s -= running_buf[r]
         ret[i] = s
-        i += 1
     return ret
 
 
