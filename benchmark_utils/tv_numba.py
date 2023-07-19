@@ -209,7 +209,7 @@ difft.jitter = nb.njit(
 )
 
 
-def TDMA(a, b, c, d, x):
+def solve_tridiag(a, b, c, d, x):
     r"""
     Solve a tridiagonal system of equations.
 
@@ -264,7 +264,7 @@ def TDMA(a, b, c, d, x):
         x[i - 1] = g[i - 1] - w[i - 1] * x[i]
 
 
-TDMA.jitter = nb.njit(
+solve_tridiag.jitter = nb.njit(
     [
         "void(f8[:],f8[:],f8[:],f8[:],f8[:])",
         "void(f4[:],f4[:],f4[:],f4[:],f4[:])",
@@ -315,7 +315,7 @@ def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
         # cost =  0.5 * np.sum(np.abs(y - x)**2) + lmbd * np.sum(tmp)
         cost = fast_cost(y, x, tmp, lmbd)
         f_diag = (tmp / lmbd) + ddt_diag
-        TDMA(ddt_down, f_diag, ddt_up, diffy, tmp)
+        solve_tridiag(ddt_down, f_diag, ddt_up, diffy, tmp)
         x = y - difft(tmp)
         if (cost_prev - cost) / cost_prev <= tol:
             break
@@ -426,7 +426,7 @@ def gtv_mm_tol2(y, lmbd, K=1, max_iter=100, tol=1e-3):
         tmp = 1 / tmp
         tmp = running_sum_valid(tmp, K)
         f_diag = 1 / (tmp * lmbd) + ddt_diag
-        TDMA(ddt_down, f_diag, ddt_up, diffy, tmp)
+        solve_tridiag(ddt_down, f_diag, ddt_up, diffy, tmp)
         x = y - difft(tmp)
         if (cost_prev - cost) <= tol * cost_prev:
             break
