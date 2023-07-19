@@ -156,7 +156,8 @@ def prox_condat(y, lmbd):
 
 
 def fast_cost(y, x, r, lmbd):
-    return 0.5 * np.sum(np.abs(y - x) ** 2) + lmbd * np.sum(r)
+    res = y - x
+    return 0.5 * np.dot(res, res) + lmbd * np.sum(r)
 
 
 fast_cost.jitter = nb.njit(
