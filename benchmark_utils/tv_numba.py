@@ -156,7 +156,7 @@ def prox_condat(y, lmbd):
 
 
 def fast_cost(y, x, r, lmbd):
-    return 0.5 * np.sqrt(np.sum(np.abs(y - x) ** 2)) + lmbd * np.sum(r)
+    return 0.5 * np.sum(np.abs(y - x) ** 2) + lmbd * np.sum(r)
 
 
 fast_cost.jitter = nb.njit(
@@ -293,7 +293,7 @@ def tv_mm(y, lmbd, max_iter=100, tol=1e-3):
         tmp = np.abs(x[1:] - x[:-1])
         if np.all(tmp == 0):
             break
-        # cost =  0.5 * np.sqrt(np.sum(np.abs(y - x)**2)) + lmbd * np.sum(tmp)
+        # cost =  0.5 * np.sum(np.abs(y - x)**2) + lmbd * np.sum(tmp)
         cost = fast_cost(y, x, tmp, lmbd)
         f_diag = (tmp / lmbd) + ddt_diag
         TDMA(ddt_down, f_diag, ddt_up, diffy, tmp)
