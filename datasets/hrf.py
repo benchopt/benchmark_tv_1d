@@ -14,7 +14,7 @@ class Dataset(BaseDataset):
     name = "HRF"
 
     parameters = {
-        "sim_tr": [1.0],  # time resolution in ms
+        "sim_tr": [1.0],  # time resolution in s
         "block_on": [10],  # time on in seconds
         "block_off": [10],  # time off in seconds
         "n_blocks": [5],  # number of blocks
@@ -44,16 +44,16 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         rng = np.random.RandomState(self.random_state)
-        block_size = self.block_on + self.block_off
-        n_samples = self.n_blocks * block_size
-        duration = self.sim_tr * n_samples
+        block_duration = self.block_on + self.block_off
+        duration = self.n_blocks * block_duration
+        n_samples = duration / self.sim_tr
 
         # create a repeating block design
         event = []
         t = 0
         while t < duration:
             event.append((t, self.block_on, 1))
-            t += block_size
+            t += block_duration
         events = np.array(event)
         regressor, _ = compute_regressor(
             events.T,
