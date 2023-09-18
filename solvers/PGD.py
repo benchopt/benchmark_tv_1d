@@ -38,26 +38,25 @@ class Solver(BaseSolver):
         # alpha / rho
         stepsize = self.alpha / get_l2norm(self.A)**2
         # initialisation
-        u = self.c * np.ones(p)
-        u_acc = u.copy()
-        u_old = u.copy()
+        self.u = self.c * np.ones(p)
+        u_acc = self.u.copy()
+        u_old = self.u.copy()
 
         t_new = 1
-        while callback(u):
+        while callback(self.u):
             if self.use_acceleration:
                 t_old = t_new
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
-                u_old[:] = u
-                u[:] = u_acc
-            u = ptv.tv1_1d(
-                u - stepsize * self.grad(self.A, u),
+                u_old[:] = self.u
+                self.u[:] = u_acc
+            self.u = ptv.tv1_1d(
+                self.u - stepsize * self.grad(self.A, self.u),
                 self.reg * stepsize, method='condat')
             if self.use_acceleration:
-                u_acc[:] = u + (t_old - 1.) / t_new * (u - u_old)
-        self.u = u
+                u_acc[:] = self.u + (t_old - 1.) / t_new * (self.u - u_old)
 
     def get_result(self):
-        return self.u
+        return dict(u=self.u)
 
     def grad(self, A, u):
         R = self.y - A @ u

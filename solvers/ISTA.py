@@ -36,26 +36,25 @@ class Solver(BaseSolver):
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(AL, ord=2)**2)
         # initialisation
-        z = np.zeros(p)
-        z[0] = self.c
-        z_old = z.copy()
-        z_acc = z.copy()
+        self.z = np.zeros(p)
+        self.z[0] = self.c
+        z_old = self.z.copy()
+        z_acc = self.z.copy()
 
         t_new = 1
-        while callback(np.cumsum(z)):
+        while callback():
             if self.use_acceleration:
                 t_old = t_new
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
-                z_old[:] = z
-                z[:] = z_acc
-            z = prox_z(z - stepsize * self.grad(AL, z),
+                z_old[:] = self.z
+                self.z[:] = z_acc
+            self.z = prox_z(self.z - stepsize * self.grad(AL, self.z),
                        self.reg * stepsize)
             if self.use_acceleration:
-                z_acc[:] = z + (t_old - 1.) / t_new * (z - z_old)
-        self.u = np.cumsum(z)
+                z_acc[:] = self.z + (t_old - 1.) / t_new * (self.z - z_old)
 
     def get_result(self):
-        return self.u
+        return dict(u=np.cumsum(self.z))
 
     def grad(self, A, u):
         R = self.y - A @ u

@@ -57,14 +57,14 @@ class Solver(BaseSolver):
         # alpha / rho
         stepsize = self.alpha / (np.linalg.norm(DA_inv, ord=2)**2)
         # initialisation
-        u = self.c * np.ones(p)
+        self.u = self.c * np.ones(p)
         v = np.zeros(p - 1)
         v_tmp = np.zeros(p)
         v_old = v.copy()
         v_acc = v.copy()
 
         t_new = 1
-        while callback(u):
+        while callback():
             if self.use_acceleration:
                 t_old = t_new
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2
@@ -83,11 +83,10 @@ class Solver(BaseSolver):
                 v_acc[:] = v + (t_old - 1.) / t_new * (v - v_old)
 
             if isinstance(self.A, np.ndarray):
-                u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
+                self.u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
             else:
-                u, _ = cg(AtA, Aty + np.diff(v, append=0, prepend=0),
-                          x0=u, tol=tol_cg)
-        self.u = u
+                self.u, _ = cg(AtA, Aty + np.diff(v, append=0, prepend=0),
+                          x0=self.u, tol=tol_cg)
 
     def get_result(self):
-        return self.u
+        return dict(u=self.u)
