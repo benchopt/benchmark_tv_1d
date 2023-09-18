@@ -49,7 +49,7 @@ class Solver(BaseSolver):
                 z_old[:] = self.z
                 self.z[:] = z_acc
             self.z = prox_z(self.z - stepsize * self.grad(AL, self.z),
-                       self.reg * stepsize)
+                            self.reg * stepsize)
             if self.use_acceleration:
                 z_acc[:] = self.z + (t_old - 1.) / t_new * (self.z - z_old)
 

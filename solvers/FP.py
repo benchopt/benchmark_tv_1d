@@ -56,7 +56,7 @@ class Solver(BaseSolver):
                 z_acc[:] = self.z + (t_old - 1.) / t_new * (self.z - z_old)
 
     def get_result(self):
-        return dict(u=np.cumsum(z))
+        return dict(u=np.cumsum(self.z))
 
     def grad(self, A, u):
         R = self.y - A @ u
