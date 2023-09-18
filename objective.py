@@ -9,13 +9,14 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
-    min_benchopt_version = "1.3"
     name = "TV1D"
+    min_benchopt_version = "1.5"
 
-    parameters = {'reg': [0.5],
-                  'delta': [0.9],
-                  'data_fit': ['quad', 'huber']
-                  }
+    parameters = {
+        'reg': [0.5],
+        'delta': [0.9],
+        'data_fit': ['quad', 'huber']
+    }
 
     def set_data(self, A, y, x):
         self.A, self.y, self.x = A, y, x
@@ -23,7 +24,7 @@ class Objective(BaseObjective):
         self.c = self.get_c(S, self.delta)
         self.reg_scaled = self.reg*self.get_reg_max(self.c)
 
-    def compute(self, u):
+    def evaluate_result(self, u):
         R = self.y - self.A @ u
         reg_TV = abs(np.diff(u)).sum()
         if self.data_fit == 'quad':
@@ -34,8 +35,8 @@ class Objective(BaseObjective):
 
         return dict(value=loss + self.reg_scaled * reg_TV, norm_x=norm_x)
 
-    def get_one_solution(self):
-        return np.zeros(self.A.shape[1])
+    def get_one_result(self):
+        return dict(u=np.zeros(self.A.shape[1]))
 
     def get_objective(self):
         return dict(A=self.A, reg=self.reg_scaled, y=self.y, c=self.c,

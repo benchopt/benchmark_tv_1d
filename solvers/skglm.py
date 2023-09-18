@@ -77,4 +77,4 @@ class Solver(BaseSolver):
         return previous + 1
 
     def get_result(self):
-        return self.u
+        return dict(u=self.u)

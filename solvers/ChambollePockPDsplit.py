@@ -36,13 +36,13 @@ class Solver(BaseSolver):
         sigma_v = 1.0 / (self.ratio * LD)
         sigma_w = 1.0 / (self.ratio * LA)
         # Init variables
-        u = np.zeros(p)
         v = np.zeros(p - 1)  # we consider non-cyclic finite difference
         w = np.zeros(n)
-        u_bar = u.copy()
+        self.u = np.zeros(p)
+        u_bar = self.u.copy()
 
-        while callback(u):
-            u_old = u
+        while callback():
+            u_old = self.u
             v = np.clip(v + sigma_v * np.diff(u_bar),
                         -self.reg, self.reg)
             w_tmp = w + sigma_w * self.A @ u_bar
@@ -55,12 +55,11 @@ class Solver(BaseSolver):
             else:
                 w = (w_tmp - sigma_w * self.y) / (1.0 + sigma_w)
             # grad.T = -div, hence + sign
-            u = u + tau * np.diff(v, prepend=0, append=0) - tau * self.A.T @ w
-            u_bar = u + self.theta * (u - u_old)
-        self.u = u
+            self.u += tau * (np.diff(v, prepend=0, append=0) - self.A.T @ w)
+            u_bar = self.u + self.theta * (self.u - u_old)
 
     def get_result(self):
-        return self.u
+        return dict(u=self.u)
 
     def _prox_huber(self, u, mu):
         return np.where(

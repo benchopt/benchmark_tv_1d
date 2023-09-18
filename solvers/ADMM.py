@@ -44,7 +44,7 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         p = self.A.shape[1]
-        u = self.c * np.ones(p)
+        self.u = u = self.c * np.ones(p)
         z = np.zeros(p - 1)
         mu = np.zeros(p - 1)
         gamma = self.gamma
@@ -63,7 +63,7 @@ class Solver(BaseSolver):
                 self.A @ x) - gamma * np.diff(
                 np.diff(x), append=0, prepend=0))
 
-        while callback(u):
+        while callback():
             z_old = z
             if self.data_fit == 'quad':
                 u_tmp = (Aty + np.diff(mu, append=0, prepend=0)
@@ -95,7 +95,7 @@ class Solver(BaseSolver):
                     gamma *= 2
                 if s > 10 * r:
                     gamma /= 2
-        self.u = u
+            self.u = u
 
     def get_result(self):
-        return self.u
+        return dict(u=self.u)
