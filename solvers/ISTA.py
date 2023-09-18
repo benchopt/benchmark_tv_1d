@@ -11,7 +11,7 @@ class Solver(BaseSolver):
     """Proximal gradient descent for synthesis formulation."""
     name = 'Primal PGD synthesis (ISTA)'
 
-    stopping_strategy = 'callback'
+    sampling_strategy = 'callback'
 
     # any parameter defined here is accessible as a class attribute
     parameters = {'alpha': [1., 1.9],

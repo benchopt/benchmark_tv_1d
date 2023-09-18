@@ -23,8 +23,10 @@ class Solver(BaseSolver):
     )
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'alpha': [1.],
-                  'use_acceleration': [False, True]}
+    parameters = {
+        'alpha': [1.],
+        'use_acceleration': [False, True]
+    }
 
     def set_objective(self, A, reg, y, c, delta, data_fit):
         self.reg = reg
@@ -43,7 +45,7 @@ class Solver(BaseSolver):
         u_old = self.u.copy()
 
         t_new = 1
-        while callback(self.u):
+        while callback():
             if self.use_acceleration:
                 t_old = t_new
                 t_new = (1 + np.sqrt(1 + 4 * t_old ** 2)) / 2

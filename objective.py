@@ -35,7 +35,7 @@ class Objective(BaseObjective):
 
         return dict(value=loss + self.reg_scaled * reg_TV, norm_x=norm_x)
 
-    def get_one_solution(self):
+    def get_one_result(self):
         return dict(u=np.zeros(self.A.shape[1]))
 
     def get_objective(self):
