@@ -86,7 +86,7 @@ class Solver(BaseSolver):
                 self.u = AtA_inv @ (Aty + np.diff(v, append=0, prepend=0))
             else:
                 self.u, _ = cg(AtA, Aty + np.diff(v, append=0, prepend=0),
-                          x0=self.u, tol=tol_cg)
+                               x0=self.u, tol=tol_cg)
 
     def get_result(self):
         return dict(u=self.u)
