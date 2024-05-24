@@ -10,10 +10,14 @@ $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm
 - $\\boldsymbol{y} \\in \\mathbb{R}^{n}$ is a vector of observations or targets.
 - $A \\in \\mathbb{R}^{n \\times p}$ is a design matrix or forward operator.
 - $\\lambda > 0$ is a regularization hyperparameter.
-- $f(\\boldsymbol{y}, A\\boldsymbol{u}) = \\sum\\limits_{k} l(y_{k}, (A\\boldsymbol{u})_{k})$ is a loss function, where $l$ can be quadratic loss as $l(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss as $l(y, x) = h_{\\delta} (y - x)$ defined by
+- $f(\\boldsymbol{y}, A\\boldsymbol{u}) = \\sum\\limits\_{k} l(y\_{k}, (A\\boldsymbol{u})_{k})$ is a loss function, where $l$ can be quadratic loss as $l(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss as $l(y, x) = h_{\\delta} (y - x)$ defined by
 
 $A_u$
+$A_u A_u$
+
 $A\_u$
+$A\_u A \_u$
+$\\| \\boldsymbol{u} \\|_{TV}$
 
 $$
 h_{\\delta}(t) = \\begin{cases} \\frac{1}{2} t^2 & \\mathrm{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\mathrm{ otherwise} \\end{cases}
