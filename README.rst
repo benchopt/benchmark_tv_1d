@@ -15,6 +15,9 @@ $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm
 $A_u$
 $A_u A_u$
 
+$l(y, x) = h_{\\delta} (y - x)$
+$l(y, x) = h\_{\\delta} (y - x)$
+
 $A\_u$
 $A\_u A \_u$
 $\\| \\boldsymbol{u} \\|_{TV}$
