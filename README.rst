@@ -12,8 +12,10 @@ $$\\boldsymbol{u} \\in \\underset{\\boldsymbol{u} \\in \\mathbb{R}^{p}}{\\mathrm
 - $\\lambda > 0$ is a regularization hyperparameter.
 - $f(\\boldsymbol{y}, A\\boldsymbol{u}) = \\sum\\limits_{k} l(y_{k}, (A\\boldsymbol{u})_{k})$ is a loss function, where $l$ can be quadratic loss as $l(y, x) = \\frac{1}{2} \\vert y - x \\vert_2^2$, or Huber loss as $l(y, x) = h_{\\delta} (y - x)$ defined by
 
+$A_u$
+$A\_u$
 
-$$   
+$$
 h_{\\delta}(t) = \\begin{cases} \\frac{1}{2} t^2 & \\mathrm{ if } \\vert t \\vert \\le \\delta \\\\ \\delta \\vert t \\vert - \\frac{1}{2} \\delta^2 & \\mathrm{ otherwise} \\end{cases}
 $$
 
@@ -36,7 +38,7 @@ This benchmark can be run using the following commands:
 
    $ pip install -U benchopt
    $ git clone https://github.com/benchopt/benchmark_tv_1d
-   $ benchopt run benchmark_tv_1d 
+   $ benchopt run benchmark_tv_1d
 
 Apart from the problem, options can be passed to `benchopt run`, to restrict the benchmarks to some solvers or datasets, e.g.:
 
