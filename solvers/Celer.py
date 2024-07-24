@@ -19,7 +19,7 @@ class Solver(BaseSolver):
         patience=3, strategy='iteration'
     )
     install_cmd = 'conda'
-    requirements = ['pip:celer']
+    requirements = ['pip::celer']
     references = [
         'M. Massias, A. Gramfort and J. Salmon, ICML, '
         '"Celer: a Fast Solver for the Lasso with Dual Extrapolation", '
